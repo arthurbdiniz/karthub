@@ -184,6 +184,9 @@ func (h *Driver) UpdateMyProfile(w http.ResponseWriter, r *http.Request) {
 	if avatar := readAvatar(r); avatar != "" {
 		driver.Avatar = &avatar
 	}
+	if r.FormValue("remove_avatar") == "1" {
+		driver.Avatar = nil
+	}
 	if v := r.FormValue("country_code"); v != "" {
 		driver.CountryCode = &v
 	} else {
