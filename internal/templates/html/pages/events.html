@@ -1,0 +1,55 @@
+{{define "title"}}Events - KartHub{{end}}
+
+{{define "content"}}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Events</h1>
+        {{if isStaff .User.Role}}
+        <a href="/admin/events/new" class="bg-blue-600 text-white text-sm py-2 px-4 rounded hover:bg-blue-700">+ New Event</a>
+        {{end}}
+    </div>
+
+    <div class="space-y-4">
+        {{range .Events}}
+        <a href="/events/{{.ID}}" class="block bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6">
+            <div class="flex justify-between items-start">
+                <div class="space-y-1">
+                    <p class="font-semibold text-gray-900 text-lg">{{.Date | fmtDate}}</p>
+                    <div class="flex items-center space-x-3 text-sm text-gray-500">
+                        <span>📍 {{.TrackName}}, {{.TrackCity}}</span>
+                        {{if .Time}}<span>🕐 {{.Time}}</span>{{end}}
+                        <span>⏱️ {{.DurationMinutes}}min</span>
+                    </div>
+                    {{if .Notes}}<p class="text-sm text-gray-600 mt-2">{{.Notes}}</p>{{end}}
+                </div>
+                <div class="text-right flex-shrink-0 ml-4 space-y-1">
+                    {{if eq .Status "completed"}}
+                    <span class="inline-block text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">Completed</span>
+                    {{else if eq .Status "ongoing"}}
+                    <span class="inline-block text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">🏁 Ongoing</span>
+                    {{else if eq .Status "closed"}}
+                    <span class="inline-block text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">Lineup Locked</span>
+                    <div class="text-xs text-gray-500">{{.BookingCount}}/{{.MaxDrivers}} booked</div>
+                    {{else}}
+                    <div class="text-sm font-medium {{if ge .BookingCount .MaxDrivers}}text-red-600{{else}}text-green-600{{end}}">
+                        {{sub .MaxDrivers .BookingCount}} seats left
+                    </div>
+                    <div class="text-xs text-gray-500">{{.BookingCount}}/{{.MaxDrivers}} booked</div>
+                    {{if gt .WaitlistCount 0}}
+                    <div class="text-xs text-yellow-600">{{.WaitlistCount}} on waitlist</div>
+                    {{end}}
+                    {{if ge .BookingCount .MaxDrivers}}
+                    <span class="inline-block text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">Full</span>
+                    {{end}}
+                    {{end}}
+                </div>
+            </div>
+        </a>
+        {{else}}
+        <div class="bg-white rounded-lg shadow p-6 text-center">
+            <p class="text-gray-500">No events scheduled yet.</p>
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}

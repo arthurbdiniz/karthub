@@ -1,0 +1,69 @@
+{{define "title"}}New Track - KartHub{{end}}
+
+{{define "content"}}
+<div class="max-w-lg mx-auto">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">{{if .Track}}Edit Track{{else}}New Track{{end}}</h1>
+
+    <form method="POST" action="{{if .Track}}/admin/tracks/{{.Track.ID}}{{else}}/admin/tracks{{end}}" class="space-y-4 bg-white rounded-lg shadow p-6">
+
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+            <input type="text" id="name" name="name" required
+                value="{{if .Track}}{{.Track.Name}}{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div>
+            <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+            <input type="text" id="country" name="country" required
+                value="{{if .Track}}{{.Track.Country}}{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div>
+            <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+            <input type="text" id="city" name="city" required
+                value="{{if .Track}}{{.Track.City}}{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div>
+            <label for="length_meters" class="block text-sm font-medium text-gray-700">Length (meters)</label>
+            <input type="number" id="length_meters" name="length_meters" min="0"
+                value="{{if .Track}}{{if .Track.LengthMeters}}{{.Track.LengthMeters}}{{end}}{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div class="flex items-center">
+            <input type="checkbox" id="indoor" name="indoor" {{if .Track}}{{if .Track.Indoor}}checked{{end}}{{end}}
+                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <label for="indoor" class="ml-2 text-sm text-gray-700">Indoor track</label>
+        </div>
+
+        <div>
+            <label for="location_url" class="block text-sm font-medium text-gray-700">Location (Maps URL)</label>
+            <input type="url" id="location_url" name="location_url"
+                placeholder="https://maps.app.goo.gl/..."
+                value="{{if .Track}}{{if .Track.LocationURL}}{{.Track.LocationURL}}{{end}}{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+            <p class="mt-1 text-xs text-gray-400">Share link from Google Maps</p>
+        </div>
+
+        <div>
+            <label for="map_embed" class="block text-sm font-medium text-gray-700">Map Embed (iframe)</label>
+            <textarea id="map_embed" name="map_embed" rows="3"
+                placeholder='Paste the iframe from Google Maps "Embed a map"'
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border font-mono text-xs">{{if .Track}}{{if .Track.MapEmbed}}{{.Track.MapEmbed}}{{end}}{{end}}</textarea>
+            <p class="mt-1 text-xs text-gray-400">Google Maps → Share → Embed a map → Copy HTML</p>
+        </div>
+
+        <div class="flex justify-between items-center pt-4">
+            <a href="/tracks" class="text-gray-600 hover:text-gray-800 text-sm">← Cancel</a>
+            <button type="submit"
+                class="bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                {{if .Track}}Update{{else}}Create Track{{end}}
+            </button>
+        </div>
+    </form>
+</div>
+{{end}}

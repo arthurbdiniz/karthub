@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  host: "0.0.0.0"
+
+base_url: "http://localhost:8080"
+
+database:
+  path: "data/karthub.db"
+
+session:
+  secret: "change-me-in-production"
+  max_age: 2592000  # 30 days
+  secure: false
+  http_only: true
+
+mail:
+  dev_mode: true  # Prints magic links to terminal instead of sending emails
+  resend_api_key: ""  # Set via KARTHUB_RESEND_API_KEY env var
+  from_address: "noreply@yourdomain.com"
+  from_name: "KartHub"
+
+log:
+  level: "info"

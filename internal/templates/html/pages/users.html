@@ -1,0 +1,31 @@
+{{define "title"}}Users - KartHub Admin{{end}}
+
+{{define "content"}}
+<div class="space-y-6">
+    <div>
+        <a href="/admin" class="text-gray-500 hover:text-gray-700 text-sm">← Back to Admin</a>
+        <h1 class="text-2xl font-bold text-gray-900 mt-2">Manage Users</h1>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="divide-y divide-gray-200">
+            {{range .Users}}
+            <div class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                <div>
+                    <p class="font-medium text-gray-900">{{.Name}}</p>
+                    <p class="text-sm text-gray-500">{{.Email}}</p>
+                </div>
+                <form method="POST" action="/admin/users/{{.ID}}/role" class="flex items-center space-x-2">
+                    <select name="role" class="text-sm rounded border-gray-300 px-2 py-1">
+                        <option value="user" {{if eq .Role "user"}}selected{{end}}>User</option>
+                        <option value="organizer" {{if eq .Role "organizer"}}selected{{end}}>Organizer</option>
+                        <option value="admin" {{if eq .Role "admin"}}selected{{end}}>Admin</option>
+                    </select>
+                    <button type="submit" class="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Save</button>
+                </form>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>
+{{end}}

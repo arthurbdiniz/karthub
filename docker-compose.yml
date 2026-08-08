@@ -1,0 +1,17 @@
+services:
+  karthub:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - karthub_data:/app/data
+    environment:
+      - KARTHUB_SESSION_SECRET=${SESSION_SECRET:-change-me-in-production}
+      - KARTHUB_RESEND_API_KEY=${RESEND_API_KEY:-}
+      - KARTHUB_MAIL_FROM=${MAIL_FROM:-noreply@yourdomain.com}
+      - KARTHUB_BASE_URL=${BASE_URL:-http://localhost:8080}
+      - KARTHUB_LOG_LEVEL=info
+    restart: unless-stopped
+
+volumes:
+  karthub_data:

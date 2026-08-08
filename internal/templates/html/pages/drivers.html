@@ -1,0 +1,46 @@
+{{define "title"}}Drivers - KartHub{{end}}
+
+{{define "content"}}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Drivers</h1>
+        {{if not .MyDriver}}
+        <a href="/drivers/new" class="bg-blue-600 text-white text-sm py-2 px-4 rounded hover:bg-blue-700">+ Create My Profile</a>
+        {{else}}
+        <a href="/drivers/me/edit" class="text-blue-600 hover:text-blue-800 text-sm">Edit My Profile</a>
+        {{end}}
+    </div>
+
+    <div x-data="{ search: '' }">
+        <input type="text" x-model="search" placeholder="Search by name or nickname..."
+            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-sm">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+            {{range .Drivers}}
+            <a href="/drivers/{{.ID}}"
+                x-show="!search || '{{.Name}}{{if .Nickname}} {{.Nickname}}{{end}}'.toLowerCase().includes(search.toLowerCase())"
+                class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow {{if $.MyDriver}}{{if eq .ID $.MyDriver.ID}}ring-2 ring-blue-500{{end}}{{end}}">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gray-200">
+                            {{if .Avatar}}
+                            <img src="{{.Avatar | safeURL}}" alt="" class="w-full h-full object-cover">
+                            {{else}}
+                            <span class="text-lg font-bold text-gray-400">{{slice .Name 0 1}}</span>
+                            {{end}}
+                        </div>
+                        <div>
+                            {{if .Nickname}}<p class="font-semibold text-gray-900">{{.Nickname}}</p>{{end}}
+                            <p class="text-sm text-gray-500">{{.Name}}</p>
+                        </div>
+                    </div>
+                    {{if $.MyDriver}}{{if eq .ID $.MyDriver.ID}}<span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">You</span>{{end}}{{end}}
+                </div>
+            </a>
+            {{else}}
+            <p class="text-gray-500 col-span-full">No drivers registered yet. Be the first!</p>
+            {{end}}
+        </div>
+    </div>
+</div>
+{{end}}

@@ -1,0 +1,83 @@
+{{define "title"}}New Event - KartHub{{end}}
+
+{{define "content"}}
+<div class="max-w-lg mx-auto">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">{{if .Event}}Edit Event{{else}}New Event{{end}}</h1>
+
+    <form method="POST" action="{{if .Event}}/admin/events/{{.Event.ID}}{{else}}/admin/events{{end}}" class="space-y-4 bg-white rounded-lg shadow p-6">
+
+        <div>
+            <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
+            <input type="date" id="date" name="date" required
+                value="{{if .Event}}{{.Event.Date | isoDate}}{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div>
+            <label for="time" class="block text-sm font-medium text-gray-700">Time</label>
+            <input type="time" id="time" name="time"
+                value="{{if .Event}}{{if .Event.Time}}{{.Event.Time}}{{end}}{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div>
+            <label for="duration_minutes" class="block text-sm font-medium text-gray-700">Duration (minutes)</label>
+            <input type="number" id="duration_minutes" name="duration_minutes" min="10" step="5" value="{{if .Event}}{{.Event.DurationMinutes}}{{else}}60{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div>
+            <label for="track_id" class="block text-sm font-medium text-gray-700">Track</label>
+            <select id="track_id" name="track_id" required
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+                <option value="">Select a track</option>
+                {{range .Tracks}}
+                <option value="{{.ID}}" {{if $.Event}}{{if eq .ID $.Event.TrackID}}selected{{end}}{{end}}>{{.Name}} ({{.City}})</option>
+                {{end}}
+            </select>
+        </div>
+
+        <div>
+            <label for="max_drivers" class="block text-sm font-medium text-gray-700">Max Drivers</label>
+            <input type="number" id="max_drivers" name="max_drivers" required min="2" value="{{if .Event}}{{.Event.MaxDrivers}}{{else}}20{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div>
+            <label for="entry_fee_cents" class="block text-sm font-medium text-gray-700">Entry Fee (cents)</label>
+            <input type="number" id="entry_fee_cents" name="entry_fee_cents" min="0" value="{{if .Event}}{{.Event.EntryFeeCents}}{{else}}0{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div>
+            <label for="payment_info" class="block text-sm font-medium text-gray-700">Payment Info</label>
+            <textarea id="payment_info" name="payment_info" rows="2"
+                placeholder="e.g. Pay €60 to @username on Revolut before the event"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">{{if .Event}}{{if .Event.PaymentInfo}}{{.Event.PaymentInfo}}{{end}}{{end}}</textarea>
+            <p class="mt-1 text-xs text-gray-400">Shown to drivers when they book. Include Revolut link, IBAN, etc.</p>
+        </div>
+
+        <div>
+            <label for="organizer_contact" class="block text-sm font-medium text-gray-700">Organizer Contact</label>
+            <textarea id="organizer_contact" name="organizer_contact" rows="2"
+                placeholder="e.g. John +353 85 123 4567 (WhatsApp)"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">{{if .Event}}{{if .Event.OrganizerContact}}{{.Event.OrganizerContact}}{{end}}{{end}}</textarea>
+            <p class="mt-1 text-xs text-gray-400">Contact for payment issues or questions. Visible to all drivers.</p>
+        </div>
+
+        <div>
+            <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+            <textarea id="notes" name="notes" rows="3"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">{{if .Event}}{{if .Event.Notes}}{{.Event.Notes}}{{end}}{{end}}</textarea>
+        </div>
+
+        <div class="flex justify-between items-center pt-4">
+            <a href="/events" class="text-gray-600 hover:text-gray-800 text-sm">← Cancel</a>
+            <button type="submit"
+                class="bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                {{if .Event}}Update{{else}}Create Event{{end}}
+            </button>
+        </div>
+    </form>
+</div>
+{{end}}

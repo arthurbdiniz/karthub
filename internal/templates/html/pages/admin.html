@@ -1,0 +1,39 @@
+{{define "title"}}Admin - KartHub{{end}}
+
+{{define "content"}}
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-gray-900">Admin</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a href="/admin/events/new" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+            <h2 class="font-semibold text-gray-900 mb-1">🏁 New Event</h2>
+            <p class="text-sm text-gray-500">Schedule a race day</p>
+        </a>
+
+        <a href="/admin/tracks/new" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+            <h2 class="font-semibold text-gray-900 mb-1">🛤️ New Track</h2>
+            <p class="text-sm text-gray-500">Add a karting circuit</p>
+        </a>
+
+        <a href="/events" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+            <h2 class="font-semibold text-gray-900 mb-1">📅 Manage Events</h2>
+            <p class="text-sm text-gray-500">View and edit all events</p>
+        </a>
+
+        <a href="/tracks" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+            <h2 class="font-semibold text-gray-900 mb-1">📍 Manage Tracks</h2>
+            <p class="text-sm text-gray-500">View and edit all tracks</p>
+        </a>
+
+        <a href="/drivers" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+            <h2 class="font-semibold text-gray-900 mb-1">👥 Manage Drivers</h2>
+            <p class="text-sm text-gray-500">View all driver profiles</p>
+        </a>
+
+        <a href="/admin/users" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+            <h2 class="font-semibold text-gray-900 mb-1">🔑 Manage Users</h2>
+            <p class="text-sm text-gray-500">Assign roles (admin only)</p>
+        </a>
+    </div>
+</div>
+{{end}}

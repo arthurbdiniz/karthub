@@ -1,0 +1,59 @@
+{{define "nav"}}
+<nav class="bg-white shadow-sm border-b border-gray-200" x-data="{ open: false }">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-14">
+            <div class="flex items-center">
+                <a href="/" class="text-xl font-bold text-gray-900">🏎️ KartHub</a>
+            </div>
+
+            <!-- Desktop nav -->
+            {{if .User}}
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="/events" class="text-gray-600 hover:text-gray-900 text-sm">Events</a>
+                <a href="/drivers" class="text-gray-600 hover:text-gray-900 text-sm">Drivers</a>
+                <a href="/tracks" class="text-gray-600 hover:text-gray-900 text-sm">Tracks</a>
+                {{if eq .User.Role "admin"}}
+                <a href="/admin" class="text-blue-600 hover:text-blue-800 text-sm">Admin</a>
+                {{else if eq .User.Role "organizer"}}
+                <a href="/admin" class="text-blue-600 hover:text-blue-800 text-sm">Organize</a>
+                {{end}}
+                <form method="POST" action="/logout">
+                    <button type="submit" class="text-sm text-gray-600 hover:text-gray-900">Logout</button>
+                </form>
+            </div>
+
+            <!-- Mobile hamburger -->
+            <div class="md:hidden flex items-center">
+                <button @click="open = !open" class="text-gray-600 hover:text-gray-900 p-2">
+                    <svg x-show="!open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <svg x-show="open" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            {{end}}
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    {{if .User}}
+    <div x-show="open" x-cloak class="md:hidden border-t border-gray-200 bg-white">
+        <div class="px-4 py-3 space-y-2">
+            <a href="/events" class="block text-gray-700 hover:text-gray-900 py-2">Events</a>
+            <a href="/drivers" class="block text-gray-700 hover:text-gray-900 py-2">Drivers</a>
+            <a href="/tracks" class="block text-gray-700 hover:text-gray-900 py-2">Tracks</a>
+            {{if eq .User.Role "admin"}}
+            <a href="/admin" class="block text-blue-600 hover:text-blue-800 py-2">Admin</a>
+            {{else if eq .User.Role "organizer"}}
+            <a href="/admin" class="block text-blue-600 hover:text-blue-800 py-2">Organize</a>
+            {{end}}
+            <form method="POST" action="/logout" class="pt-2 border-t border-gray-100">
+                <button type="submit" class="text-gray-600 hover:text-gray-900 py-2">Logout</button>
+            </form>
+        </div>
+    </div>
+    {{end}}
+</nav>
+{{end}}
