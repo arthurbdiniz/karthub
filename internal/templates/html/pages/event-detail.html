@@ -295,15 +295,12 @@
         </div>
         {{if .CanUpload}}
         <form hx-post="/events/{{.Event.ID}}/photos" hx-encoding="multipart/form-data" hx-swap="none"
-            class="mb-4 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-            <label class="block cursor-pointer text-center">
-                <input type="file" name="photos" accept="image/*" multiple required class="hidden" id="photo-input-{{.Event.ID}}">
-                <p class="text-sm text-gray-600">Tap to select photos</p>
-                <p class="text-xs text-gray-400 mt-1">You can select multiple at once</p>
-            </label>
-            <div class="mt-3 text-center">
-                <button type="submit" class="bg-blue-600 text-white text-sm py-2 px-4 rounded hover:bg-blue-700">Upload</button>
-            </div>
+            class="mb-4 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 cursor-pointer"
+            x-data="{ files: 0 }" @click="$refs.fileInput.click()">
+            <input type="file" name="photos" accept="image/*" multiple required class="hidden" x-ref="fileInput"
+                @change="files = $event.target.files.length; if(files > 0) $el.closest('form').requestSubmit()">
+            <p class="text-sm text-gray-600 text-center">Tap to select photos</p>
+            <p class="text-xs text-gray-400 mt-1 text-center">You can select multiple at once</p>
         </form>
         {{end}}
 
