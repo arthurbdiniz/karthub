@@ -32,6 +32,20 @@ func New() *Templates {
 		"isStaff": func(role string) bool {
 			return role == "admin" || role == "organizer"
 		},
+		"flag": func(code string) string {
+			if len(code) != 2 {
+				return ""
+			}
+			r0 := rune(code[0]) - 'A' + 0x1F1E6
+			r1 := rune(code[1]) - 'A' + 0x1F1E6
+			return string([]rune{r0, r1})
+		},
+		"deref": func(s *string) string {
+			if s == nil {
+				return ""
+			}
+			return *s
+		},
 		"fmtDate": func(s string) string {
 			t, err := time.Parse(time.RFC3339, s)
 			if err != nil {

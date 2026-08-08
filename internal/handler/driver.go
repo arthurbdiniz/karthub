@@ -105,6 +105,9 @@ func (h *Driver) Setup(w http.ResponseWriter, r *http.Request) {
 	if avatar := readAvatar(r); avatar != "" {
 		d.Avatar = &avatar
 	}
+	if v := r.FormValue("country_code"); v != "" {
+		d.CountryCode = &v
+	}
 
 	if err := h.drivers.Create(r.Context(), d); err != nil {
 		if err := h.tmpl.Render(w, "setup", map[string]any{"User": user, "Error": "Failed to create profile"}); err != nil {
@@ -144,6 +147,9 @@ func (h *Driver) CreateProfile(w http.ResponseWriter, r *http.Request) {
 	if avatar := readAvatar(r); avatar != "" {
 		d.Avatar = &avatar
 	}
+	if v := r.FormValue("country_code"); v != "" {
+		d.CountryCode = &v
+	}
 
 	if err := h.drivers.Create(r.Context(), d); err != nil {
 		http.Error(w, "Failed to create profile", http.StatusInternalServerError)
@@ -177,6 +183,11 @@ func (h *Driver) UpdateMyProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	if avatar := readAvatar(r); avatar != "" {
 		driver.Avatar = &avatar
+	}
+	if v := r.FormValue("country_code"); v != "" {
+		driver.CountryCode = &v
+	} else {
+		driver.CountryCode = nil
 	}
 	if err := h.drivers.Update(r.Context(), driver); err != nil {
 		http.Error(w, "Failed to update profile", http.StatusInternalServerError)

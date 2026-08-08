@@ -30,7 +30,7 @@
                             {{end}}
                         </div>
                         <div>
-                            {{if .Nickname}}<p class="font-semibold text-gray-900">{{.Nickname}}</p>{{end}}
+                            {{if .Nickname}}<p class="font-semibold text-gray-900">{{.Nickname}}{{if .CountryCode}} {{flag .CountryCode}}{{end}}</p>{{end}}
                             <p class="text-sm text-gray-500">{{.Name}}</p>
                         </div>
                     </div>

@@ -24,6 +24,50 @@
         </div>
 
         <div>
+            <label for="country_code" class="block text-sm font-medium text-gray-700">Country Flag (optional)</label>
+            <select id="country_code" name="country_code"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+                <option value="">No flag</option>
+                <option value="AR" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "AR"}}selected{{end}}{{end}}{{end}}>🇦🇷 Argentina</option>
+                <option value="AU" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "AU"}}selected{{end}}{{end}}{{end}}>🇦🇺 Australia</option>
+                <option value="AT" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "AT"}}selected{{end}}{{end}}{{end}}>🇦🇹 Austria</option>
+                <option value="BE" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "BE"}}selected{{end}}{{end}}{{end}}>🇧🇪 Belgium</option>
+                <option value="BR" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "BR"}}selected{{end}}{{end}}{{end}}>🇧🇷 Brazil</option>
+                <option value="CA" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "CA"}}selected{{end}}{{end}}{{end}}>🇨🇦 Canada</option>
+                <option value="CL" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "CL"}}selected{{end}}{{end}}{{end}}>🇨🇱 Chile</option>
+                <option value="CN" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "CN"}}selected{{end}}{{end}}{{end}}>🇨🇳 China</option>
+                <option value="CO" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "CO"}}selected{{end}}{{end}}{{end}}>🇨🇴 Colombia</option>
+                <option value="CZ" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "CZ"}}selected{{end}}{{end}}{{end}}>🇨🇿 Czech Republic</option>
+                <option value="DK" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "DK"}}selected{{end}}{{end}}{{end}}>🇩🇰 Denmark</option>
+                <option value="FI" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "FI"}}selected{{end}}{{end}}{{end}}>🇫🇮 Finland</option>
+                <option value="FR" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "FR"}}selected{{end}}{{end}}{{end}}>🇫🇷 France</option>
+                <option value="DE" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "DE"}}selected{{end}}{{end}}{{end}}>🇩🇪 Germany</option>
+                <option value="HU" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "HU"}}selected{{end}}{{end}}{{end}}>🇭🇺 Hungary</option>
+                <option value="IN" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "IN"}}selected{{end}}{{end}}{{end}}>🇮🇳 India</option>
+                <option value="IE" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "IE"}}selected{{end}}{{end}}{{end}}>🇮🇪 Ireland</option>
+                <option value="IT" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "IT"}}selected{{end}}{{end}}{{end}}>🇮🇹 Italy</option>
+                <option value="JP" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "JP"}}selected{{end}}{{end}}{{end}}>🇯🇵 Japan</option>
+                <option value="KR" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "KR"}}selected{{end}}{{end}}{{end}}>🇰🇷 South Korea</option>
+                <option value="LV" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "LV"}}selected{{end}}{{end}}{{end}}>🇱🇻 Latvia</option>
+                <option value="LT" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "LT"}}selected{{end}}{{end}}{{end}}>🇱🇹 Lithuania</option>
+                <option value="MX" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "MX"}}selected{{end}}{{end}}{{end}}>🇲🇽 Mexico</option>
+                <option value="NL" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "NL"}}selected{{end}}{{end}}{{end}}>🇳🇱 Netherlands</option>
+                <option value="NZ" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "NZ"}}selected{{end}}{{end}}{{end}}>🇳🇿 New Zealand</option>
+                <option value="NG" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "NG"}}selected{{end}}{{end}}{{end}}>🇳🇬 Nigeria</option>
+                <option value="NO" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "NO"}}selected{{end}}{{end}}{{end}}>🇳🇴 Norway</option>
+                <option value="PL" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "PL"}}selected{{end}}{{end}}{{end}}>🇵🇱 Poland</option>
+                <option value="PT" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "PT"}}selected{{end}}{{end}}{{end}}>🇵🇹 Portugal</option>
+                <option value="RO" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "RO"}}selected{{end}}{{end}}{{end}}>🇷🇴 Romania</option>
+                <option value="ZA" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "ZA"}}selected{{end}}{{end}}{{end}}>🇿🇦 South Africa</option>
+                <option value="ES" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "ES"}}selected{{end}}{{end}}{{end}}>🇪🇸 Spain</option>
+                <option value="SE" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "SE"}}selected{{end}}{{end}}{{end}}>🇸🇪 Sweden</option>
+                <option value="CH" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "CH"}}selected{{end}}{{end}}{{end}}>🇨🇭 Switzerland</option>
+                <option value="GB" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "GB"}}selected{{end}}{{end}}{{end}}>🇬🇧 United Kingdom</option>
+                <option value="US" {{if .Driver}}{{if .Driver.CountryCode}}{{if eq (deref .Driver.CountryCode) "US"}}selected{{end}}{{end}}{{end}}>🇺🇸 United States</option>
+            </select>
+        </div>
+
+        <div>
             <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
             <textarea id="bio" name="bio" rows="3"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">{{if .Driver}}{{if .Driver.Bio}}{{.Driver.Bio}}{{end}}{{end}}</textarea>

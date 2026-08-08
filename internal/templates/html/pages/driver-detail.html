@@ -14,7 +14,7 @@
                 {{end}}
             </div>
             <div>
-                {{if .Driver.Nickname}}<h1 class="text-2xl font-bold text-gray-900">{{.Driver.Nickname}}</h1>{{end}}
+                {{if .Driver.Nickname}}<h1 class="text-2xl font-bold text-gray-900">{{.Driver.Nickname}}{{if .Driver.CountryCode}} {{flag .Driver.CountryCode}}{{end}}</h1>{{end}}
                 <p class="text-gray-600">{{.Driver.Name}}</p>
                 <p class="text-sm text-gray-400">Joined {{.Driver.JoinedAt.Format "January 2006"}}</p>
             </div>

@@ -21,15 +21,16 @@ type MagicToken struct {
 }
 
 type Driver struct {
-	ID        int64     `json:"id"`
-	UserID    *int64    `json:"user_id,omitempty"`
-	Name      string    `json:"name"`
-	Nickname  *string   `json:"nickname,omitempty"`
-	Avatar    *string   `json:"avatar,omitempty"`
-	Bio       *string   `json:"bio,omitempty"`
-	JoinedAt  time.Time `json:"joined_at"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID          int64     `json:"id"`
+	UserID      *int64    `json:"user_id,omitempty"`
+	Name        string    `json:"name"`
+	Nickname    *string   `json:"nickname,omitempty"`
+	Avatar      *string   `json:"avatar,omitempty"`
+	CountryCode *string   `json:"country_code,omitempty"`
+	Bio         *string   `json:"bio,omitempty"`
+	JoinedAt    time.Time `json:"joined_at"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type Track struct {

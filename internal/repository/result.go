@@ -27,12 +27,13 @@ type ResultWithDriver struct {
 	DriverName     string
 	DriverNickname *string
 	DriverAvatar   *string
+	DriverCountry  *string
 }
 
 func (r *ResultRepository) ListByEvent(ctx context.Context, eventID int64) ([]ResultWithDriver, error) {
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT r.id, r.event_id, r.driver_id, r.position, r.best_lap_time, r.fastest_lap, r.dnf, r.penalty_seconds, r.notes,
-			d.name, d.nickname, d.avatar
+			d.name, d.nickname, d.avatar, d.country_code
 		FROM results r
 		JOIN drivers d ON d.id = r.driver_id
 		WHERE r.event_id = ?
@@ -46,7 +47,7 @@ func (r *ResultRepository) ListByEvent(ctx context.Context, eventID int64) ([]Re
 	var results []ResultWithDriver
 	for rows.Next() {
 		var res ResultWithDriver
-		if err := rows.Scan(&res.ID, &res.EventID, &res.DriverID, &res.Position, &res.BestLapTime, &res.FastestLap, &res.DNF, &res.PenaltySeconds, &res.Notes, &res.DriverName, &res.DriverNickname, &res.DriverAvatar); err != nil {
+		if err := rows.Scan(&res.ID, &res.EventID, &res.DriverID, &res.Position, &res.BestLapTime, &res.FastestLap, &res.DNF, &res.PenaltySeconds, &res.Notes, &res.DriverName, &res.DriverNickname, &res.DriverAvatar, &res.DriverCountry); err != nil {
 			return nil, fmt.Errorf("scanning result: %w", err)
 		}
 		results = append(results, res)
