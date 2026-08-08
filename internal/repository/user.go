@@ -53,8 +53,7 @@ func (r *UserRepository) CreateFromEmail(ctx context.Context, email string) (*mo
 	// First user gets admin role
 	role := "user"
 	var count int
-	r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM users").Scan(&count)
-	if count == 0 {
+	if err := r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM users").Scan(&count); err == nil && count == 0 {
 		role = "admin"
 	}
 
@@ -85,7 +84,7 @@ func (r *UserRepository) List(ctx context.Context) ([]models.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("querying users: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var users []models.User
 	for rows.Next() {

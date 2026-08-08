@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/karthub/karthub/internal/mail"
@@ -37,13 +38,17 @@ func NewAuth(
 }
 
 func (h *Auth) LoginPage(w http.ResponseWriter, r *http.Request) {
-	h.tmpl.Render(w, "login", nil)
+	if err := h.tmpl.Render(w, "login", nil); err != nil {
+		slog.Error("rendering login page", "error", err)
+	}
 }
 
 func (h *Auth) SendMagicLink(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	if email == "" {
-		h.tmpl.Render(w, "login", map[string]any{"Error": "Email is required"})
+		if err := h.tmpl.Render(w, "login", map[string]any{"Error": "Email is required"}); err != nil {
+			slog.Error("rendering login page", "error", err)
+		}
 		return
 	}
 
@@ -56,27 +61,34 @@ func (h *Auth) SendMagicLink(w http.ResponseWriter, r *http.Request) {
 	link := h.baseURL + "/auth/verify?token=" + token
 
 	if err := h.mail.SendMagicLink(r.Context(), email, link); err != nil {
-		h.tmpl.Render(w, "login", map[string]any{"Error": "Failed to send email. Please try again."})
+		if err := h.tmpl.Render(w, "login", map[string]any{"Error": "Failed to send email. Please try again."}); err != nil {
+			slog.Error("rendering login page", "error", err)
+		}
 		return
 	}
 
-	h.tmpl.RenderPartial(w, "check-email", map[string]any{"Email": email})
+	if err := h.tmpl.RenderPartial(w, "check-email", map[string]any{"Email": email}); err != nil {
+		slog.Error("rendering check-email partial", "error", err)
+	}
 }
 
 func (h *Auth) Verify(w http.ResponseWriter, r *http.Request) {
 	tokenStr := r.URL.Query().Get("token")
 	if tokenStr == "" {
-		h.tmpl.Render(w, "login", map[string]any{"Error": "Invalid or expired link"})
+		if err := h.tmpl.Render(w, "login", map[string]any{"Error": "Invalid or expired link"}); err != nil {
+			slog.Error("rendering login page", "error", err)
+		}
 		return
 	}
 
 	email, err := h.tokens.Consume(r.Context(), tokenStr)
 	if err != nil {
-		h.tmpl.Render(w, "login", map[string]any{"Error": "Invalid or expired link"})
+		if err := h.tmpl.Render(w, "login", map[string]any{"Error": "Invalid or expired link"}); err != nil {
+			slog.Error("rendering login page", "error", err)
+		}
 		return
 	}
 
-	// Find or create user
 	user, err := h.users.GetByEmail(r.Context(), email)
 	if err != nil {
 		http.Error(w, "Internal error", http.StatusInternalServerError)
@@ -99,6 +111,8 @@ func (h *Auth) Verify(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Auth) Logout(w http.ResponseWriter, r *http.Request) {
-	h.sessions.Destroy(w, r)
+	if err := h.sessions.Destroy(w, r); err != nil {
+		slog.Error("destroying session", "error", err)
+	}
 	http.Redirect(w, r, "/login", http.StatusFound)
 }

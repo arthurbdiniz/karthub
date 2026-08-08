@@ -22,7 +22,7 @@ func (r *DriverRepository) List(ctx context.Context) ([]models.Driver, error) {
 	if err != nil {
 		return nil, fmt.Errorf("querying drivers: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var drivers []models.Driver
 	for rows.Next() {

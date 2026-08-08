@@ -46,7 +46,7 @@ func (r *MagicTokenRepository) Consume(ctx context.Context, token string) (strin
 	if err != nil {
 		return "", fmt.Errorf("beginning transaction: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	now := time.Now().UTC().Format("2006-01-02 15:04:05")
 

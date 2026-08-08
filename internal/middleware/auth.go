@@ -51,7 +51,10 @@ func (a *Auth) ProfileRequired(next http.Handler) http.Handler {
 		}
 
 		var count int
-		a.db.QueryRow("SELECT COUNT(*) FROM drivers WHERE user_id = ?", user.ID).Scan(&count)
+		if err := a.db.QueryRow("SELECT COUNT(*) FROM drivers WHERE user_id = ?", user.ID).Scan(&count); err != nil {
+			http.Redirect(w, r, "/setup", http.StatusFound)
+			return
+		}
 		if count == 0 {
 			http.Redirect(w, r, "/setup", http.StatusFound)
 			return

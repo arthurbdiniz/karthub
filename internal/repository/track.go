@@ -22,7 +22,7 @@ func (r *TrackRepository) List(ctx context.Context) ([]models.Track, error) {
 	if err != nil {
 		return nil, fmt.Errorf("querying tracks: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var tracks []models.Track
 	for rows.Next() {

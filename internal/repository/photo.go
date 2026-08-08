@@ -35,7 +35,7 @@ func (r *PhotoRepository) ListByEvent(ctx context.Context, eventID int64) ([]mod
 	if err != nil {
 		return nil, fmt.Errorf("querying photos: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var photos []models.EventPhoto
 	for rows.Next() {

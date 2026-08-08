@@ -36,10 +36,10 @@ func (h *Result) Save(w http.ResponseWriter, r *http.Request) {
 	err := h.results.Upsert(r.Context(), eventID, driverID, position, bestLapTime, fastestLap, dnf, penaltySeconds, notes)
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		w.Write([]byte(`<span class="text-red-600 text-xs">Error</span>`))
+		_, _ = w.Write([]byte(`<span class="text-red-600 text-xs">Error</span>`))
 		return
 	}
 
 	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(`<span class="text-green-600 text-xs">✓ Saved</span>`))
+	_, _ = w.Write([]byte(`<span class="text-green-600 text-xs">✓ Saved</span>`))
 }

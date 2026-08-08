@@ -27,7 +27,7 @@ func (r *BookingRepository) Book(ctx context.Context, eventID, driverID int64) (
 	if err != nil {
 		return nil, fmt.Errorf("beginning transaction: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	// Get max drivers
 	var maxDrivers int
@@ -88,7 +88,7 @@ func (r *BookingRepository) Cancel(ctx context.Context, id int64) error {
 	if err != nil {
 		return fmt.Errorf("beginning transaction: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	var eventID int64
 	err = tx.QueryRowContext(ctx,
@@ -135,7 +135,7 @@ func (r *BookingRepository) ListByEvent(ctx context.Context, eventID int64) ([]m
 	if err != nil {
 		return nil, fmt.Errorf("querying bookings: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var bookings []models.Booking
 	for rows.Next() {
@@ -169,7 +169,7 @@ func (r *BookingRepository) ListByEventWithDrivers(ctx context.Context, eventID 
 	if err != nil {
 		return nil, fmt.Errorf("querying bookings with drivers: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var bookings []BookingWithDriver
 	for rows.Next() {

@@ -41,7 +41,7 @@ func (r *ResultRepository) ListByEvent(ctx context.Context, eventID int64) ([]Re
 	if err != nil {
 		return nil, fmt.Errorf("querying results: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var results []ResultWithDriver
 	for rows.Next() {
@@ -96,7 +96,7 @@ func (r *ResultRepository) HistoryByDriver(ctx context.Context, driverID int64) 
 	if err != nil {
 		return nil, fmt.Errorf("querying driver history: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var history []DriverRaceHistory
 	for rows.Next() {

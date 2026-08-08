@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -28,10 +29,12 @@ func NewEvent(events *repository.EventRepository, bookings *repository.BookingRe
 func (h *Event) List(w http.ResponseWriter, r *http.Request) {
 	user := middleware.UserFromContext(r.Context())
 	events, _ := h.events.ListWithTracks(r.Context())
-	h.tmpl.Render(w, "events", map[string]any{
+	if err := h.tmpl.Render(w, "events", map[string]any{
 		"User":   user,
 		"Events": events,
-	})
+	}); err != nil {
+		slog.Error("rendering events", "error", err)
+	}
 }
 
 func (h *Event) Show(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +97,7 @@ func (h *Event) Show(w http.ResponseWriter, r *http.Request) {
 		results, _ = h.results.ListByEvent(r.Context(), id)
 	}
 
-	h.tmpl.Render(w, "event-detail", map[string]any{
+	if err := h.tmpl.Render(w, "event-detail", map[string]any{
 		"User":        user,
 		"Event":       event,
 		"Track":       track,
@@ -109,13 +112,17 @@ func (h *Event) Show(w http.ResponseWriter, r *http.Request) {
 		"Photos":      photos,
 		"CanUpload":   canUpload,
 		"Results":     results,
-	})
+	}); err != nil {
+		slog.Error("rendering event detail", "error", err)
+	}
 }
 
 func (h *Event) NewForm(w http.ResponseWriter, r *http.Request) {
 	user := middleware.UserFromContext(r.Context())
 	tracks, _ := h.tracks.List(r.Context())
-	h.tmpl.Render(w, "event-form", map[string]any{"User": user, "Tracks": tracks})
+	if err := h.tmpl.Render(w, "event-form", map[string]any{"User": user, "Tracks": tracks}); err != nil {
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+	}
 }
 
 func (h *Event) CreateEvent(w http.ResponseWriter, r *http.Request) {
@@ -151,7 +158,10 @@ func (h *Event) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		e.ChampionshipID = &id
 	}
 
-	h.events.Create(r.Context(), e)
+	if err := h.events.Create(r.Context(), e); err != nil {
+		http.Error(w, "Failed to create event", http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/events", http.StatusFound)
 }
 
@@ -160,7 +170,9 @@ func (h *Event) EditForm(w http.ResponseWriter, r *http.Request) {
 	user := middleware.UserFromContext(r.Context())
 	event, _ := h.events.GetByID(r.Context(), id)
 	tracks, _ := h.tracks.List(r.Context())
-	h.tmpl.Render(w, "event-form", map[string]any{"User": user, "Event": event, "Tracks": tracks})
+	if err := h.tmpl.Render(w, "event-form", map[string]any{"User": user, "Event": event, "Tracks": tracks}); err != nil {
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+	}
 }
 
 func (h *Event) Update(w http.ResponseWriter, r *http.Request) {
@@ -202,13 +214,19 @@ func (h *Event) Update(w http.ResponseWriter, r *http.Request) {
 	} else {
 		event.OrganizerContact = nil
 	}
-	h.events.Update(r.Context(), event)
+	if err := h.events.Update(r.Context(), event); err != nil {
+		http.Error(w, "Failed to update event", http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/events", http.StatusFound)
 }
 
 func (h *Event) Delete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	h.events.Delete(r.Context(), id)
+	if err := h.events.Delete(r.Context(), id); err != nil {
+		http.Error(w, "Failed to delete event", http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/admin/events", http.StatusFound)
 }
 
@@ -242,6 +260,9 @@ func (h *Event) ToggleStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.events.SetStatus(r.Context(), id, newStatus)
+	if err := h.events.SetStatus(r.Context(), id, newStatus); err != nil {
+		http.Error(w, "Failed to update status", http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/events/"+strconv.FormatInt(id, 10), http.StatusFound)
 }

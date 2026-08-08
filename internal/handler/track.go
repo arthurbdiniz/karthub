@@ -23,15 +23,19 @@ func NewTrack(tracks *repository.TrackRepository, tmpl *templates.Templates) *Tr
 func (h *Track) List(w http.ResponseWriter, r *http.Request) {
 	user := middleware.UserFromContext(r.Context())
 	tracks, _ := h.tracks.List(r.Context())
-	h.tmpl.Render(w, "tracks", map[string]any{
+	if err := h.tmpl.Render(w, "tracks", map[string]any{
 		"User":   user,
 		"Tracks": tracks,
-	})
+	}); err != nil {
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+	}
 }
 
 func (h *Track) NewForm(w http.ResponseWriter, r *http.Request) {
 	user := middleware.UserFromContext(r.Context())
-	h.tmpl.Render(w, "track-form", map[string]any{"User": user})
+	if err := h.tmpl.Render(w, "track-form", map[string]any{"User": user}); err != nil {
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+	}
 }
 
 func (h *Track) CreateTrack(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +54,10 @@ func (h *Track) CreateTrack(w http.ResponseWriter, r *http.Request) {
 	if v := r.FormValue("map_embed"); v != "" {
 		t.MapEmbed = &v
 	}
-	h.tracks.Create(r.Context(), t)
+	if err := h.tracks.Create(r.Context(), t); err != nil {
+		http.Error(w, "Failed to create track", http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/tracks", http.StatusFound)
 }
 
@@ -58,7 +65,9 @@ func (h *Track) EditForm(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	user := middleware.UserFromContext(r.Context())
 	track, _ := h.tracks.GetByID(r.Context(), id)
-	h.tmpl.Render(w, "track-form", map[string]any{"User": user, "Track": track})
+	if err := h.tmpl.Render(w, "track-form", map[string]any{"User": user, "Track": track}); err != nil {
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+	}
 }
 
 func (h *Track) Update(w http.ResponseWriter, r *http.Request) {
@@ -85,12 +94,18 @@ func (h *Track) Update(w http.ResponseWriter, r *http.Request) {
 	} else {
 		track.MapEmbed = nil
 	}
-	h.tracks.Update(r.Context(), track)
+	if err := h.tracks.Update(r.Context(), track); err != nil {
+		http.Error(w, "Failed to update track", http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/tracks", http.StatusFound)
 }
 
 func (h *Track) Delete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	h.tracks.Delete(r.Context(), id)
+	if err := h.tracks.Delete(r.Context(), id); err != nil {
+		http.Error(w, "Failed to delete track", http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/admin/tracks", http.StatusFound)
 }

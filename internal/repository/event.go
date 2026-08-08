@@ -22,7 +22,7 @@ func (r *EventRepository) List(ctx context.Context) ([]models.Event, error) {
 	if err != nil {
 		return nil, fmt.Errorf("querying events: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var events []models.Event
 	for rows.Next() {
@@ -55,7 +55,7 @@ func (r *EventRepository) Upcoming(ctx context.Context, limit int) ([]models.Eve
 	if err != nil {
 		return nil, fmt.Errorf("querying upcoming events: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var events []models.Event
 	for rows.Next() {
@@ -159,7 +159,7 @@ func (r *EventRepository) ListWithTracks(ctx context.Context) ([]EventWithTrack,
 	if err != nil {
 		return nil, fmt.Errorf("querying events with tracks: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var events []EventWithTrack
 	for rows.Next() {
@@ -187,7 +187,7 @@ func (r *EventRepository) UpcomingWithTracks(ctx context.Context, limit int) ([]
 	if err != nil {
 		return nil, fmt.Errorf("querying upcoming events with tracks: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var events []EventWithTrack
 	for rows.Next() {
@@ -215,7 +215,7 @@ func (r *EventRepository) PastWithTracks(ctx context.Context, limit int) ([]Even
 	if err != nil {
 		return nil, fmt.Errorf("querying past events with tracks: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var events []EventWithTrack
 	for rows.Next() {

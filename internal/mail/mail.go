@@ -79,11 +79,13 @@ func (s *Sender) send(ctx context.Context, to, subject, html string) error {
 	if err != nil {
 		return fmt.Errorf("sending email: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode >= 400 {
 		var errResp map[string]any
-		json.NewDecoder(resp.Body).Decode(&errResp)
+		if err := json.NewDecoder(resp.Body).Decode(&errResp); err != nil {
+			s.logger.Error("decoding resend error response", "error", err)
+		}
 		s.logger.Error("resend API error", "status", resp.StatusCode, "response", errResp)
 		return fmt.Errorf("resend API returned %d", resp.StatusCode)
 	}

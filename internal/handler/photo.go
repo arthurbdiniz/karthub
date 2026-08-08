@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -22,7 +23,9 @@ type Photo struct {
 }
 
 func NewPhoto(photos *repository.PhotoRepository, drivers *repository.DriverRepository, uploadDir string) *Photo {
-	os.MkdirAll(uploadDir, 0o750)
+	if err := os.MkdirAll(uploadDir, 0o750); err != nil {
+		slog.Error("creating upload directory", "error", err)
+	}
 	return &Photo{photos: photos, drivers: drivers, uploadDir: uploadDir}
 }
 
@@ -36,14 +39,16 @@ func (h *Photo) Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check participation
 	participated, _ := h.photos.DriverParticipated(r.Context(), eventID, driver.ID)
 	if !participated {
 		http.Error(w, "Only participants can upload photos", http.StatusForbidden)
 		return
 	}
 
-	r.ParseMultipartForm(50 << 20) // 50MB max total
+	if err := r.ParseMultipartForm(50 << 20); err != nil {
+		http.Error(w, "Upload too large", http.StatusBadRequest)
+		return
+	}
 
 	files := r.MultipartForm.File["photos"]
 	if len(files) == 0 {
@@ -57,30 +62,33 @@ func (h *Photo) Upload(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		// Generate unique filename
 		ext := filepath.Ext(header.Filename)
 		name, _ := randomFilename()
 		filename := name + ext
 
-		// Save to disk
 		dst, err := os.Create(filepath.Join(h.uploadDir, filename))
 		if err != nil {
-			file.Close()
+			_ = file.Close()
 			continue
 		}
 
-		io.Copy(dst, file)
-		dst.Close()
-		file.Close()
+		if _, err := io.Copy(dst, file); err != nil {
+			_ = dst.Close()
+			_ = file.Close()
+			continue
+		}
+		_ = dst.Close()
+		_ = file.Close()
 
-		// Save to DB
 		photo := &models.EventPhoto{
 			EventID:      eventID,
 			DriverID:     driver.ID,
 			Filename:     filename,
 			OriginalName: header.Filename,
 		}
-		h.photos.Create(r.Context(), photo)
+		if err := h.photos.Create(r.Context(), photo); err != nil {
+			slog.Error("saving photo record", "error", err)
+		}
 	}
 
 	w.Header().Set("HX-Refresh", "true")
@@ -90,8 +98,6 @@ func (h *Photo) Upload(w http.ResponseWriter, r *http.Request) {
 func (h *Photo) Delete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	user := middleware.UserFromContext(r.Context())
-
-	// Only admin or the uploader can delete
 	_ = user
 
 	filename, err := h.photos.Delete(r.Context(), id)
@@ -100,14 +106,12 @@ func (h *Photo) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Remove file from disk
-	os.Remove(filepath.Join(h.uploadDir, filename))
+	_ = os.Remove(filepath.Join(h.uploadDir, filename))
 
 	w.Header().Set("HX-Refresh", "true")
 	w.WriteHeader(http.StatusOK)
 }
 
-// ServeFile serves uploaded photos
 func (h *Photo) ServeFile(w http.ResponseWriter, r *http.Request) {
 	filename := chi.URLParam(r, "filename")
 	http.ServeFile(w, r, filepath.Join(h.uploadDir, filename))

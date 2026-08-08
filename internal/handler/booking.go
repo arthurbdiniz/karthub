@@ -26,14 +26,14 @@ func (h *Booking) Create(w http.ResponseWriter, r *http.Request) {
 	event, _ := h.events.GetByID(r.Context(), eventID)
 	if event == nil || event.Status != "open" {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		w.Write([]byte(`<div class="text-red-600 text-sm">Bookings are not open for this event</div>`))
+		_, _ = w.Write([]byte(`<div class="text-red-600 text-sm">Bookings are not open for this event</div>`))
 		return
 	}
 
 	_, err := h.bookings.Book(r.Context(), eventID, driverID)
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		w.Write([]byte(`<div class="text-red-600 text-sm">` + err.Error() + `</div>`))
+		_, _ = w.Write([]byte(`<div class="text-red-600 text-sm">` + err.Error() + `</div>`))
 		return
 	}
 
@@ -44,11 +44,10 @@ func (h *Booking) Create(w http.ResponseWriter, r *http.Request) {
 func (h *Booking) Cancel(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 
-	// Check if event is still open
 	event, _ := h.events.GetByBookingID(r.Context(), id)
 	if event != nil && event.Status != "open" {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		w.Write([]byte(`<div class="text-red-600 text-sm">Cannot cancel — event is no longer open</div>`))
+		_, _ = w.Write([]byte(`<div class="text-red-600 text-sm">Cannot cancel — event is no longer open</div>`))
 		return
 	}
 
