@@ -62,4 +62,4 @@ Data persists in the `karthub_data` Docker volume.
 
 ## License
 
-MIT
+Apache-2.0
