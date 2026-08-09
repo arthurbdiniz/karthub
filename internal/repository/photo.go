@@ -131,3 +131,14 @@ func (r *PhotoRepository) Reorder(ctx context.Context, ids []int64) error {
 	}
 	return nil
 }
+
+func (r *PhotoRepository) GetEventIDByFilename(ctx context.Context, filename string) (int64, error) {
+	var eventID int64
+	err := r.db.QueryRowContext(ctx,
+		"SELECT event_id FROM event_photos WHERE filename = ?", filename,
+	).Scan(&eventID)
+	if err != nil {
+		return 0, fmt.Errorf("querying event by filename: %w", err)
+	}
+	return eventID, nil
+}

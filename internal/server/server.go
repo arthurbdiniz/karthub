@@ -77,15 +77,12 @@ func (s *Server) setupRouter() {
 	trackHandler := handler.NewTrack(trackRepo, tmpl)
 	eventHandler := handler.NewEvent(eventRepo, bookingRepo, trackRepo, driverRepo, photoRepo, resultRepo, tmpl)
 	bookingHandler := handler.NewBooking(bookingRepo, eventRepo, tmpl)
-	photoHandler := handler.NewPhoto(photoRepo, driverRepo, "data/uploads")
+	mediaHandler := handler.NewMedia(photoRepo, driverRepo, "data/uploads")
 	resultHandler := handler.NewResult(resultRepo)
 	feedbackHandler := handler.NewFeedback(feedbackRepo, driverRepo, tmpl)
 
 	// Static files
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(templates.StaticFS()))))
-
-	// Uploaded photos
-	r.Get("/uploads/{filename}", photoHandler.ServeFile)
 
 	// Public routes
 	r.Group(func(r chi.Router) {
@@ -101,6 +98,9 @@ func (s *Server) setupRouter() {
 
 		r.Get("/", dashHandler.Index)
 		r.Post("/logout", authHandler.Logout)
+
+		// Uploaded media (access controlled)
+		r.Get("/uploads/{filename}", mediaHandler.ServeFile)
 
 		// First-time profile setup
 		r.Get("/setup", driverHandler.SetupForm)
@@ -125,14 +125,14 @@ func (s *Server) setupRouter() {
 		r.Route("/events", func(r chi.Router) {
 			r.Get("/", eventHandler.List)
 			r.Get("/{id}", eventHandler.Show)
-			r.Post("/{eventID}/photos", photoHandler.Upload)
-			r.Post("/{eventID}/photos/{id}/up", photoHandler.MoveUp)
-			r.Post("/{eventID}/photos/{id}/down", photoHandler.MoveDown)
-			r.Post("/{eventID}/photos/reorder", photoHandler.Reorder)
+			r.Post("/{eventID}/photos", mediaHandler.Upload)
+			r.Post("/{eventID}/photos/{id}/up", mediaHandler.MoveUp)
+			r.Post("/{eventID}/photos/{id}/down", mediaHandler.MoveDown)
+			r.Post("/{eventID}/photos/reorder", mediaHandler.Reorder)
 			r.Post("/{eventID}/results", resultHandler.Save)
 			r.Post("/{eventID}/results/reset", resultHandler.Delete)
 			r.Get("/{eventID}/results", resultHandler.Table)
-			r.Delete("/photos/{id}", photoHandler.Delete)
+			r.Delete("/photos/{id}", mediaHandler.Delete)
 		})
 
 		// Bookings

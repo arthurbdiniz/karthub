@@ -16,20 +16,20 @@ import (
 	"github.com/karthub/karthub/internal/repository"
 )
 
-type Photo struct {
+type Media struct {
 	photos    *repository.PhotoRepository
 	drivers   *repository.DriverRepository
 	uploadDir string
 }
 
-func NewPhoto(photos *repository.PhotoRepository, drivers *repository.DriverRepository, uploadDir string) *Photo {
+func NewMedia(photos *repository.PhotoRepository, drivers *repository.DriverRepository, uploadDir string) *Media {
 	if err := os.MkdirAll(uploadDir, 0o750); err != nil {
 		slog.Error("creating upload directory", "error", err)
 	}
-	return &Photo{photos: photos, drivers: drivers, uploadDir: uploadDir}
+	return &Media{photos: photos, drivers: drivers, uploadDir: uploadDir}
 }
 
-func (h *Photo) Upload(w http.ResponseWriter, r *http.Request) {
+func (h *Media) Upload(w http.ResponseWriter, r *http.Request) {
 	eventID, _ := strconv.ParseInt(chi.URLParam(r, "eventID"), 10, 64)
 	user := middleware.UserFromContext(r.Context())
 
@@ -95,7 +95,7 @@ func (h *Photo) Upload(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *Photo) Delete(w http.ResponseWriter, r *http.Request) {
+func (h *Media) Delete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	user := middleware.UserFromContext(r.Context())
 	_ = user
@@ -112,8 +112,35 @@ func (h *Photo) Delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *Photo) ServeFile(w http.ResponseWriter, r *http.Request) {
+func (h *Media) ServeFile(w http.ResponseWriter, r *http.Request) {
+	user := middleware.UserFromContext(r.Context())
 	filename := chi.URLParam(r, "filename")
+
+	// Staff can access everything
+	if user.Role == "admin" || user.Role == "organizer" {
+		http.ServeFile(w, r, filepath.Join(h.uploadDir, filename))
+		return
+	}
+
+	// Check if user's driver participated in the event this photo belongs to
+	driver, _ := h.drivers.GetByUserID(r.Context(), user.ID)
+	if driver == nil {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	eventID, err := h.photos.GetEventIDByFilename(r.Context(), filename)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	participated, _ := h.photos.DriverParticipated(r.Context(), eventID, driver.ID)
+	if !participated {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
 	http.ServeFile(w, r, filepath.Join(h.uploadDir, filename))
 }
 
@@ -125,7 +152,7 @@ func randomFilename() (string, error) {
 	return hex.EncodeToString(b), nil
 }
 
-func (h *Photo) MoveUp(w http.ResponseWriter, r *http.Request) {
+func (h *Media) MoveUp(w http.ResponseWriter, r *http.Request) {
 	eventID, _ := strconv.ParseInt(chi.URLParam(r, "eventID"), 10, 64)
 	photoID, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	_ = h.photos.MoveUp(r.Context(), eventID, photoID)
@@ -133,7 +160,7 @@ func (h *Photo) MoveUp(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *Photo) MoveDown(w http.ResponseWriter, r *http.Request) {
+func (h *Media) MoveDown(w http.ResponseWriter, r *http.Request) {
 	eventID, _ := strconv.ParseInt(chi.URLParam(r, "eventID"), 10, 64)
 	photoID, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	_ = h.photos.MoveDown(r.Context(), eventID, photoID)
@@ -141,7 +168,7 @@ func (h *Photo) MoveDown(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *Photo) Reorder(w http.ResponseWriter, r *http.Request) {
+func (h *Media) Reorder(w http.ResponseWriter, r *http.Request) {
 	user := middleware.UserFromContext(r.Context())
 	if user == nil || (user.Role != "admin" && user.Role != "organizer") {
 		http.Error(w, "Forbidden", http.StatusForbidden)
