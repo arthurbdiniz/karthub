@@ -4,8 +4,8 @@
   "description": "Organize karting races with friends",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f9fafb",
-  "theme_color": "#2563eb",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
   "orientation": "portrait",
   "icons": [
     {
