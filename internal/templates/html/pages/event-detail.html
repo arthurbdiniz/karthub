@@ -294,14 +294,40 @@
             <h2 class="text-lg font-semibold text-gray-900">📸 Photos</h2>
         </div>
         {{if .CanUpload}}
-        <form hx-post="/events/{{.Event.ID}}/photos" hx-encoding="multipart/form-data" hx-swap="none"
-            class="mb-4 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 cursor-pointer"
-            x-data="{ files: 0 }" @click="$refs.fileInput.click()">
-            <input type="file" name="photos" accept="image/*" multiple required class="hidden" x-ref="fileInput"
-                @change="files = $event.target.files.length; if(files > 0) $el.closest('form').requestSubmit()">
-            <p class="text-sm text-gray-600 text-center">Tap to select photos</p>
-            <p class="text-xs text-gray-400 mt-1 text-center">You can select multiple at once</p>
-        </form>
+        <div x-data="{ uploading: false, progress: 0 }" class="mb-4">
+            <div @click="if(!uploading) $refs.fileInput.click()"
+                class="p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 cursor-pointer text-center"
+                :class="{ 'pointer-events-none opacity-50': uploading }">
+                <input type="file" name="photos" accept="image/*" multiple class="hidden" x-ref="fileInput"
+                    @change="
+                        if($event.target.files.length === 0) return;
+                        uploading = true;
+                        progress = 0;
+                        let form = new FormData();
+                        for(let f of $event.target.files) form.append('photos', f);
+                        let xhr = new XMLHttpRequest();
+                        xhr.upload.onprogress = (e) => { if(e.lengthComputable) progress = Math.round((e.loaded/e.total)*100); };
+                        xhr.onload = () => { uploading = false; window.location.reload(); };
+                        xhr.onerror = () => { uploading = false; alert('Upload failed'); };
+                        xhr.open('POST', '/events/{{.Event.ID}}/photos');
+                        xhr.send(form);
+                    ">
+                <template x-if="!uploading">
+                    <div>
+                        <p class="text-sm text-gray-600">Tap to select photos</p>
+                        <p class="text-xs text-gray-400 mt-1">You can select multiple at once</p>
+                    </div>
+                </template>
+                <template x-if="uploading">
+                    <div>
+                        <p class="text-sm text-gray-700 font-medium mb-2">Uploading... <span x-text="progress + '%'"></span></p>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full transition-all" :style="'width:' + progress + '%'"></div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
         {{end}}
 
         {{if .Photos}}
