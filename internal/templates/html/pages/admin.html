@@ -30,10 +30,12 @@
             <p class="text-sm text-gray-500">View all driver profiles</p>
         </a>
 
+        {{if eq .User.Role "admin"}}
         <a href="/admin/users" class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
             <h2 class="font-semibold text-gray-900 mb-1">🔑 Manage Users</h2>
             <p class="text-sm text-gray-500">Assign roles (admin only)</p>
         </a>
+        {{end}}
     </div>
 </div>
 {{end}}
