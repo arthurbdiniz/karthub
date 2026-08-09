@@ -373,7 +373,7 @@
                 {{range $i, $p := .Photos}}
                 {{if or (hasSuffix .Filename ".mp4") (hasSuffix .Filename ".mov") (hasSuffix .Filename ".webm")}}
                 <div class="cursor-pointer relative" data-id="{{$p.ID}}" @click="idx = {{$i}}; isVideo = true; open = true">
-                    <video src="/uploads/{{$p.Filename}}" class="w-full h-32 object-cover rounded" muted></video>
+                    <video src="/uploads/{{$p.Filename}}" class="w-full h-32 object-cover rounded" muted preload="none" playsinline></video>
                     <span class="absolute top-1 right-1 bg-black/60 text-white text-xs px-1 rounded">▶</span>
                 </div>
                 {{else}}
