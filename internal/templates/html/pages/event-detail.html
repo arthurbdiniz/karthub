@@ -366,6 +366,7 @@
 
         {{if .Photos}}
         <div x-data="{ open: false, idx: 0, isVideo: false, photos: [{{range $i, $p := .Photos}}'/uploads/{{$p.Filename}}'{{if not (eq $i (sub (len $.Photos) 1))}},{{end}}{{end}}], photoIds: [{{range $i, $p := .Photos}}{{$p.ID}}{{if not (eq $i (sub (len $.Photos) 1))}},{{end}}{{end}}] }"
+            x-effect="document.body.style.overflow = open ? 'hidden' : ''"
             @keydown.left.window="if(open && idx > 0) idx--"
             @keydown.right.window="if(open && idx < photos.length-1) idx++">
 
@@ -373,7 +374,7 @@
                 {{range $i, $p := .Photos}}
                 {{if or (hasSuffix .Filename ".mp4") (hasSuffix .Filename ".mov") (hasSuffix .Filename ".webm")}}
                 <div class="cursor-pointer relative" data-id="{{$p.ID}}" @click="idx = {{$i}}; isVideo = true; open = true">
-                    <video src="/uploads/{{$p.Filename}}" class="w-full h-32 object-cover rounded" muted preload="none" playsinline></video>
+                    <video src="/uploads/{{$p.Filename}}" class="w-full h-32 object-cover rounded" muted preload="metadata" playsinline></video>
                     <span class="absolute top-1 right-1 bg-black/60 text-white text-xs px-1 rounded">▶</span>
                 </div>
                 {{else}}
@@ -388,9 +389,9 @@
             <div x-show="open" x-cloak
                 @click="open = false; document.querySelectorAll('.lightbox-video').forEach(v => v.pause())"
                 @keydown.escape.window="open = false; document.querySelectorAll('.lightbox-video').forEach(v => v.pause())"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+                class="fixed inset-0 flex items-center justify-center p-4" style="z-index: 99999; background: rgba(0,0,0,0.85)">
                 <button @click.stop="if(idx > 0) { document.querySelectorAll('.lightbox-video').forEach(v => v.pause()); idx--; }" x-show="idx > 0"
-                    class="absolute left-4 text-white text-4xl hover:text-gray-300 select-none">&#8249;</button>
+                    style="position:absolute; left:0; top:0; height:100%; width:5rem; display:flex; align-items:center; justify-content:center; font-size:2.5rem; color:white; user-select:none;">&#8249;</button>
                 <template x-if="open && (photos[idx].endsWith('.mp4') || photos[idx].endsWith('.mov') || photos[idx].endsWith('.webm'))">
                     <video :src="photos[idx]" class="lightbox-video max-w-full max-h-[90vh] rounded-lg shadow-2xl" controls @click.stop></video>
                 </template>
@@ -398,7 +399,7 @@
                     <img :src="photos[idx]" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl" @click.stop>
                 </template>
                 <button @click.stop="if(idx < photos.length-1) { document.querySelectorAll('.lightbox-video').forEach(v => v.pause()); idx++; }" x-show="idx < photos.length-1"
-                    class="absolute right-4 text-white text-4xl hover:text-gray-300 select-none">&#8250;</button>
+                    style="position:absolute; right:0; top:0; height:100%; width:5rem; display:flex; align-items:center; justify-content:center; font-size:2.5rem; color:white; user-select:none;">&#8250;</button>
                 <div class="absolute top-4 right-4 flex items-center space-x-3">
                     {{if isStaff .User.Role}}
                     <button @click.stop="if(confirm('Delete this item?')) { fetch('/events/photos/' + photoIds[idx], {method:'DELETE'}).then(() => { open = false; window.location.reload(); }); }"
