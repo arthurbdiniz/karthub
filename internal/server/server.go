@@ -127,6 +127,8 @@ func (s *Server) setupRouter() {
 			r.Get("/{id}", eventHandler.Show)
 			r.Post("/{eventID}/photos", photoHandler.Upload)
 			r.Post("/{eventID}/results", resultHandler.Save)
+			r.Post("/{eventID}/results/reset", resultHandler.Delete)
+			r.Get("/{eventID}/results", resultHandler.Table)
 			r.Delete("/photos/{id}", photoHandler.Delete)
 		})
 

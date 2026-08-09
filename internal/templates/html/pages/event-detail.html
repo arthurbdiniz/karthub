@@ -110,8 +110,8 @@
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">🏆 Results</h2>
 
+        <div id="results-table" hx-get="/events/{{.Event.ID}}/results" hx-trigger="refreshResults from:body" class="overflow-x-auto">
         {{if .Results}}
-        <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b text-left text-gray-500">
@@ -145,10 +145,10 @@
                     {{end}}
                 </tbody>
             </table>
-        </div>
         {{else}}
         <p class="text-gray-500 text-sm">No results entered yet.</p>
         {{end}}
+        </div>
 
         {{if isStaff .User.Role}}
         <!-- Admin: Enter results for each driver -->
@@ -166,6 +166,8 @@
                     <label class="flex items-center space-x-1" title="Did Not Finish"><input type="checkbox" name="dnf"><span>DNF</span></label>
                     <input type="number" name="penalty_seconds" placeholder="+s" min="0" class="w-12 px-1 py-1 border rounded">
                     <button type="submit" class="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">Save</button>
+                    <button type="button" hx-post="/events/{{$.Event.ID}}/results/reset" hx-vals='{"driver_id":"{{.DriverID}}"}' hx-confirm="Reset this result?" hx-target="next .result-status" hx-swap="innerHTML"
+                        class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700">Reset</button>
                     <span class="result-status"></span>
                 </form>
                 {{end}}

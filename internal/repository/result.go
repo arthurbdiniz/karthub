@@ -134,3 +134,12 @@ func (r *ResultRepository) StatsByDriver(ctx context.Context, driverID int64) (*
 	}
 	return &s, nil
 }
+
+func (r *ResultRepository) Delete(ctx context.Context, eventID, driverID int64) error {
+	_, err := r.db.ExecContext(ctx,
+		"DELETE FROM results WHERE event_id = ? AND driver_id = ?", eventID, driverID)
+	if err != nil {
+		return fmt.Errorf("deleting result: %w", err)
+	}
+	return nil
+}
