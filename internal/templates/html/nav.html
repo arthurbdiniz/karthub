@@ -1,5 +1,5 @@
 {{define "nav"}}
-<nav class="bg-white shadow-sm border-b border-gray-200" x-data="{ open: false }">
+<nav class="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 w-full" style="z-index: 9999" x-data="{ open: false }" x-effect="document.body.style.overflow = open ? 'hidden' : ''">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-14">
             <div class="flex items-center space-x-3">
@@ -40,20 +40,28 @@
         </div>
     </div>
 
-    <!-- Mobile menu -->
+    <!-- Mobile menu (slide from left) -->
     {{if .User}}
-    <div x-show="open" x-cloak class="md:hidden border-t border-gray-200 bg-white">
-        <div class="px-4 py-3 space-y-2">
-            <a href="/events" class="block text-gray-700 hover:text-gray-900 py-2">Events</a>
-            <a href="/drivers" class="block text-gray-700 hover:text-gray-900 py-2">Drivers</a>
-            <a href="/tracks" class="block text-gray-700 hover:text-gray-900 py-2">Tracks</a>
+    <div x-show="open" x-cloak @click="open = false" class="md:hidden" style="position: fixed; top: 3.5rem; left: 0; right: 0; bottom: 0; z-index: 9998; background: rgba(0,0,0,0.4)"></div>
+    <div x-show="open" x-cloak
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="-translate-x-full"
+        x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="-translate-x-full"
+        class="md:hidden fixed top-0 left-0 h-full shadow-lg transform pt-14" style="width: 75%; background: white; z-index: 9999">
+        <div class="px-4 py-4 space-y-3">
+            <a href="/events" class="block text-gray-700 hover:text-gray-900 py-3 text-lg" @click="open = false">Events</a>
+            <a href="/drivers" class="block text-gray-700 hover:text-gray-900 py-3 text-lg" @click="open = false">Drivers</a>
+            <a href="/tracks" class="block text-gray-700 hover:text-gray-900 py-3 text-lg" @click="open = false">Tracks</a>
             {{if eq .User.Role "admin"}}
-            <a href="/admin" class="block text-blue-600 hover:text-blue-800 py-2">Admin</a>
+            <a href="/admin" class="block text-blue-600 hover:text-blue-800 py-3 text-lg" @click="open = false">Admin</a>
             {{else if eq .User.Role "organizer"}}
-            <a href="/admin" class="block text-blue-600 hover:text-blue-800 py-2">Organize</a>
+            <a href="/admin" class="block text-blue-600 hover:text-blue-800 py-3 text-lg" @click="open = false">Organize</a>
             {{end}}
-            <form method="POST" action="/logout" class="pt-2 border-t border-gray-100">
-                <button type="submit" class="text-gray-600 hover:text-gray-900 py-2">Logout</button>
+            <form method="POST" action="/logout" class="pt-3 border-t border-gray-100">
+                <button type="submit" class="text-gray-600 hover:text-gray-900 py-3 text-lg">Logout</button>
             </form>
         </div>
     </div>
