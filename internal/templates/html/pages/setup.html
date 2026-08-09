@@ -3,7 +3,10 @@
 {{define "content"}}
 <div class="min-h-[60vh] flex items-center justify-center">
     <div class="bg-white rounded-lg shadow p-8 w-full max-w-md">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2 text-center">Welcome to KartHub! 🏎️</h1>
+        <div class="flex justify-center mb-4">
+            <img src="/static/icon-192.png" alt="KartHub" class="w-16 h-16 rounded-lg">
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2 text-center">Welcome to KartHub!</h1>
         <p class="text-center text-gray-500 mb-6">Set up your driver profile. Choose your nickname carefully — it's permanent and used on leaderboards.</p>
 
         {{if .Error}}
