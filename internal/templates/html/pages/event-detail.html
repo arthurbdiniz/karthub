@@ -290,10 +290,10 @@
     </div>
     {{end}}
 
-    <!-- Photos -->
+    <!-- Media -->
     <div class="bg-white rounded-lg shadow p-6">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">📸 Photos</h2>
+            <h2 class="text-lg font-semibold text-gray-900">📸 Media</h2>
         </div>
         {{if .CanUpload}}
         <div x-data="{
@@ -412,7 +412,7 @@
             </div>
         </div>
         {{else}}
-        <p class="text-gray-500 text-sm">No photos yet. Participants can upload race day pictures and videos here.</p>
+        <p class="text-gray-500 text-sm">No media yet. Participants can upload race day pictures and videos here.</p>
         {{end}}
 
         {{if isStaff .User.Role}}{{if .Photos}}
