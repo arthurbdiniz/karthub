@@ -393,19 +393,21 @@
             </div>
 
             <!-- Lightbox -->
-            <div x-show="open" x-cloak @click="open = false" @keydown.escape.window="open = false"
+            <div x-show="open" x-cloak
+                @click="open = false; document.querySelectorAll('.lightbox-video').forEach(v => v.pause())"
+                @keydown.escape.window="open = false; document.querySelectorAll('.lightbox-video').forEach(v => v.pause())"
                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-                <button @click.stop="if(idx > 0) idx--" x-show="idx > 0"
+                <button @click.stop="if(idx > 0) { document.querySelectorAll('.lightbox-video').forEach(v => v.pause()); idx--; }" x-show="idx > 0"
                     class="absolute left-4 text-white text-4xl hover:text-gray-300 select-none">&#8249;</button>
                 <template x-if="photos[idx].endsWith('.mp4') || photos[idx].endsWith('.mov') || photos[idx].endsWith('.webm')">
-                    <video :src="photos[idx]" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl" controls autoplay @click.stop></video>
+                    <video :src="photos[idx]" class="lightbox-video max-w-full max-h-[90vh] rounded-lg shadow-2xl" controls autoplay @click.stop></video>
                 </template>
                 <template x-if="!photos[idx].endsWith('.mp4') && !photos[idx].endsWith('.mov') && !photos[idx].endsWith('.webm')">
                     <img :src="photos[idx]" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl" @click.stop>
                 </template>
-                <button @click.stop="if(idx < photos.length-1) idx++" x-show="idx < photos.length-1"
+                <button @click.stop="if(idx < photos.length-1) { document.querySelectorAll('.lightbox-video').forEach(v => v.pause()); idx++; }" x-show="idx < photos.length-1"
                     class="absolute right-4 text-white text-4xl hover:text-gray-300 select-none">&#8250;</button>
-                <button @click="open = false" class="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300">&times;</button>
+                <button @click="open = false; document.querySelectorAll('.lightbox-video').forEach(v => v.pause())" class="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300">&times;</button>
                 <div class="absolute bottom-4 text-white text-sm" x-text="(idx+1) + ' / ' + photos.length"></div>
             </div>
         </div>
