@@ -391,10 +391,10 @@
                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
                 <button @click.stop="if(idx > 0) { document.querySelectorAll('.lightbox-video').forEach(v => v.pause()); idx--; }" x-show="idx > 0"
                     class="absolute left-4 text-white text-4xl hover:text-gray-300 select-none">&#8249;</button>
-                <template x-if="photos[idx].endsWith('.mp4') || photos[idx].endsWith('.mov') || photos[idx].endsWith('.webm')">
-                    <video :src="photos[idx]" class="lightbox-video max-w-full max-h-[90vh] rounded-lg shadow-2xl" controls autoplay @click.stop></video>
+                <template x-if="open && (photos[idx].endsWith('.mp4') || photos[idx].endsWith('.mov') || photos[idx].endsWith('.webm'))">
+                    <video :src="photos[idx]" class="lightbox-video max-w-full max-h-[90vh] rounded-lg shadow-2xl" controls @click.stop></video>
                 </template>
-                <template x-if="!photos[idx].endsWith('.mp4') && !photos[idx].endsWith('.mov') && !photos[idx].endsWith('.webm')">
+                <template x-if="open && !(photos[idx].endsWith('.mp4') || photos[idx].endsWith('.mov') || photos[idx].endsWith('.webm'))">
                     <img :src="photos[idx]" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl" @click.stop>
                 </template>
                 <button @click.stop="if(idx < photos.length-1) { document.querySelectorAll('.lightbox-video').forEach(v => v.pause()); idx++; }" x-show="idx < photos.length-1"
