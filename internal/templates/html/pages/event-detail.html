@@ -365,28 +365,20 @@
         {{end}}
 
         {{if .Photos}}
-        <div x-data="{ open: false, idx: 0, isVideo: false, photos: [{{range $i, $p := .Photos}}'/uploads/{{$p.Filename}}'{{if not (eq $i (sub (len $.Photos) 1))}},{{end}}{{end}}] }"
+        <div x-data="{ open: false, idx: 0, isVideo: false, photos: [{{range $i, $p := .Photos}}'/uploads/{{$p.Filename}}'{{if not (eq $i (sub (len $.Photos) 1))}},{{end}}{{end}}], photoIds: [{{range $i, $p := .Photos}}{{$p.ID}}{{if not (eq $i (sub (len $.Photos) 1))}},{{end}}{{end}}] }"
             @keydown.left.window="if(open && idx > 0) idx--"
             @keydown.right.window="if(open && idx < photos.length-1) idx++">
 
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div id="photo-gallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {{range $i, $p := .Photos}}
                 {{if or (hasSuffix .Filename ".mp4") (hasSuffix .Filename ".mov") (hasSuffix .Filename ".webm")}}
-                <div class="cursor-pointer relative group" @click="idx = {{$i}}; isVideo = true; open = true">
+                <div class="cursor-pointer relative" data-id="{{$p.ID}}" @click="idx = {{$i}}; isVideo = true; open = true">
                     <video src="/uploads/{{$p.Filename}}" class="w-full h-32 object-cover rounded" muted></video>
                     <span class="absolute top-1 right-1 bg-black/60 text-white text-xs px-1 rounded">▶</span>
-                    {{if isStaff $.User.Role}}
-                    <button @click.stop hx-delete="/events/photos/{{$p.ID}}" hx-confirm="Delete this video?" hx-swap="none"
-                        class="absolute top-1 left-1 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex md:hidden md:group-hover:flex items-center justify-center hover:bg-red-700">×</button>
-                    {{end}}
                 </div>
                 {{else}}
-                <div class="cursor-pointer relative group" @click="idx = {{$i}}; isVideo = false; open = true">
+                <div class="cursor-pointer relative" data-id="{{$p.ID}}" @click="idx = {{$i}}; isVideo = false; open = true">
                     <img src="/uploads/{{$p.Filename}}" alt="{{$p.OriginalName}}" class="w-full h-32 object-cover rounded hover:opacity-90 transition-opacity">
-                    {{if isStaff $.User.Role}}
-                    <button @click.stop hx-delete="/events/photos/{{$p.ID}}" hx-confirm="Delete this photo?" hx-swap="none"
-                        class="absolute top-1 left-1 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex md:hidden md:group-hover:flex items-center justify-center hover:bg-red-700">×</button>
-                    {{end}}
                 </div>
                 {{end}}
                 {{end}}
@@ -407,13 +399,41 @@
                 </template>
                 <button @click.stop="if(idx < photos.length-1) { document.querySelectorAll('.lightbox-video').forEach(v => v.pause()); idx++; }" x-show="idx < photos.length-1"
                     class="absolute right-4 text-white text-4xl hover:text-gray-300 select-none">&#8250;</button>
-                <button @click="open = false; document.querySelectorAll('.lightbox-video').forEach(v => v.pause())" class="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300">&times;</button>
+                <div class="absolute top-4 right-4 flex items-center space-x-3">
+                    {{if isStaff .User.Role}}
+                    <button @click.stop="if(confirm('Delete this item?')) { fetch('/events/photos/' + photoIds[idx], {method:'DELETE'}).then(() => { open = false; window.location.reload(); }); }"
+                        class="text-white hover:text-red-400" title="Delete">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                    {{end}}
+                    <button @click="open = false; document.querySelectorAll('.lightbox-video').forEach(v => v.pause())" class="text-white text-3xl leading-none hover:text-gray-300">&times;</button>
+                </div>
                 <div class="absolute bottom-4 text-white text-sm" x-text="(idx+1) + ' / ' + photos.length"></div>
             </div>
         </div>
         {{else}}
         <p class="text-gray-500 text-sm">No photos yet. Participants can upload race day pictures and videos here.</p>
         {{end}}
+
+        {{if isStaff .User.Role}}{{if .Photos}}
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var el = document.getElementById('photo-gallery');
+            if (el) {
+                Sortable.create(el, {
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    onEnd: function() {
+                        var ids = Array.from(el.children).map(function(item) { return item.dataset.id; });
+                        var form = new FormData();
+                        ids.forEach(function(id) { form.append('ids', id); });
+                        fetch('/events/{{.Event.ID}}/photos/reorder', { method: 'POST', body: form });
+                    }
+                });
+            }
+        });
+        </script>
+        {{end}}{{end}}
     </div>
 </div>
 {{end}}

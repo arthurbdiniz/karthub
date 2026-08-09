@@ -124,3 +124,53 @@ func randomFilename() (string, error) {
 	}
 	return hex.EncodeToString(b), nil
 }
+
+func (h *Photo) MoveUp(w http.ResponseWriter, r *http.Request) {
+	eventID, _ := strconv.ParseInt(chi.URLParam(r, "eventID"), 10, 64)
+	photoID, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	_ = h.photos.MoveUp(r.Context(), eventID, photoID)
+	w.Header().Set("HX-Refresh", "true")
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Photo) MoveDown(w http.ResponseWriter, r *http.Request) {
+	eventID, _ := strconv.ParseInt(chi.URLParam(r, "eventID"), 10, 64)
+	photoID, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	_ = h.photos.MoveDown(r.Context(), eventID, photoID)
+	w.Header().Set("HX-Refresh", "true")
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Photo) Reorder(w http.ResponseWriter, r *http.Request) {
+	user := middleware.UserFromContext(r.Context())
+	if user == nil || (user.Role != "admin" && user.Role != "organizer") {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	orderStr := r.Form["ids"]
+	var ids []int64
+	for _, s := range orderStr {
+		id, err := strconv.ParseInt(s, 10, 64)
+		if err == nil {
+			ids = append(ids, id)
+		}
+	}
+
+	if len(ids) == 0 {
+		http.Error(w, "No ids provided", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.photos.Reorder(r.Context(), ids); err != nil {
+		http.Error(w, "Failed to reorder", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

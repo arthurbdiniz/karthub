@@ -17,9 +17,13 @@ func NewPhotoRepository(db *sql.DB) *PhotoRepository {
 }
 
 func (r *PhotoRepository) Create(ctx context.Context, p *models.EventPhoto) error {
+	// Get next sort_order for this event
+	var maxOrder int
+	_ = r.db.QueryRowContext(ctx, "SELECT COALESCE(MAX(sort_order), 0) FROM event_photos WHERE event_id = ?", p.EventID).Scan(&maxOrder)
+
 	result, err := r.db.ExecContext(ctx,
-		"INSERT INTO event_photos (event_id, driver_id, filename, original_name) VALUES (?, ?, ?, ?)",
-		p.EventID, p.DriverID, p.Filename, p.OriginalName,
+		"INSERT INTO event_photos (event_id, driver_id, filename, original_name, sort_order) VALUES (?, ?, ?, ?, ?)",
+		p.EventID, p.DriverID, p.Filename, p.OriginalName, maxOrder+1,
 	)
 	if err != nil {
 		return fmt.Errorf("inserting photo: %w", err)
@@ -31,7 +35,7 @@ func (r *PhotoRepository) Create(ctx context.Context, p *models.EventPhoto) erro
 
 func (r *PhotoRepository) ListByEvent(ctx context.Context, eventID int64) ([]models.EventPhoto, error) {
 	rows, err := r.db.QueryContext(ctx,
-		"SELECT id, event_id, driver_id, filename, original_name, created_at FROM event_photos WHERE event_id = ? ORDER BY created_at DESC", eventID)
+		"SELECT id, event_id, driver_id, filename, original_name, created_at FROM event_photos WHERE event_id = ? ORDER BY sort_order ASC, created_at DESC", eventID)
 	if err != nil {
 		return nil, fmt.Errorf("querying photos: %w", err)
 	}
@@ -71,4 +75,59 @@ func (r *PhotoRepository) DriverParticipated(ctx context.Context, eventID, drive
 		return false, err
 	}
 	return count > 0, nil
+}
+
+func (r *PhotoRepository) MoveUp(ctx context.Context, eventID, photoID int64) error {
+	// Get current photo's sort_order
+	var currentOrder int
+	err := r.db.QueryRowContext(ctx, "SELECT sort_order FROM event_photos WHERE id = ?", photoID).Scan(&currentOrder)
+	if err != nil {
+		return err
+	}
+
+	// Find the photo above it (lower sort_order)
+	var prevID int64
+	var prevOrder int
+	err = r.db.QueryRowContext(ctx,
+		"SELECT id, sort_order FROM event_photos WHERE event_id = ? AND sort_order < ? ORDER BY sort_order DESC LIMIT 1",
+		eventID, currentOrder).Scan(&prevID, &prevOrder)
+	if err != nil {
+		return nil // already at top
+	}
+
+	// Swap their sort_orders
+	_, _ = r.db.ExecContext(ctx, "UPDATE event_photos SET sort_order = ? WHERE id = ?", prevOrder, photoID)
+	_, _ = r.db.ExecContext(ctx, "UPDATE event_photos SET sort_order = ? WHERE id = ?", currentOrder, prevID)
+	return nil
+}
+
+func (r *PhotoRepository) MoveDown(ctx context.Context, eventID, photoID int64) error {
+	var currentOrder int
+	err := r.db.QueryRowContext(ctx, "SELECT sort_order FROM event_photos WHERE id = ?", photoID).Scan(&currentOrder)
+	if err != nil {
+		return err
+	}
+
+	var nextID int64
+	var nextOrder int
+	err = r.db.QueryRowContext(ctx,
+		"SELECT id, sort_order FROM event_photos WHERE event_id = ? AND sort_order > ? ORDER BY sort_order ASC LIMIT 1",
+		eventID, currentOrder).Scan(&nextID, &nextOrder)
+	if err != nil {
+		return nil // already at bottom
+	}
+
+	_, _ = r.db.ExecContext(ctx, "UPDATE event_photos SET sort_order = ? WHERE id = ?", nextOrder, photoID)
+	_, _ = r.db.ExecContext(ctx, "UPDATE event_photos SET sort_order = ? WHERE id = ?", currentOrder, nextID)
+	return nil
+}
+
+func (r *PhotoRepository) Reorder(ctx context.Context, ids []int64) error {
+	for i, id := range ids {
+		_, err := r.db.ExecContext(ctx, "UPDATE event_photos SET sort_order = ? WHERE id = ?", i+1, id)
+		if err != nil {
+			return fmt.Errorf("updating sort_order: %w", err)
+		}
+	}
+	return nil
 }
