@@ -338,13 +338,21 @@
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {{range $i, $p := .Photos}}
                 {{if or (hasSuffix .Filename ".mp4") (hasSuffix .Filename ".mov") (hasSuffix .Filename ".webm")}}
-                <div class="cursor-pointer relative" @click="idx = {{$i}}; isVideo = true; open = true">
+                <div class="cursor-pointer relative group" @click="idx = {{$i}}; isVideo = true; open = true">
                     <video src="/uploads/{{$p.Filename}}" class="w-full h-32 object-cover rounded" muted></video>
                     <span class="absolute top-1 right-1 bg-black/60 text-white text-xs px-1 rounded">▶</span>
+                    {{if isStaff $.User.Role}}
+                    <button @click.stop hx-delete="/events/photos/{{$p.ID}}" hx-confirm="Delete this video?" hx-swap="none"
+                        class="absolute top-1 left-1 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex md:hidden md:group-hover:flex items-center justify-center hover:bg-red-700">×</button>
+                    {{end}}
                 </div>
                 {{else}}
-                <div class="cursor-pointer" @click="idx = {{$i}}; isVideo = false; open = true">
+                <div class="cursor-pointer relative group" @click="idx = {{$i}}; isVideo = false; open = true">
                     <img src="/uploads/{{$p.Filename}}" alt="{{$p.OriginalName}}" class="w-full h-32 object-cover rounded hover:opacity-90 transition-opacity">
+                    {{if isStaff $.User.Role}}
+                    <button @click.stop hx-delete="/events/photos/{{$p.ID}}" hx-confirm="Delete this photo?" hx-swap="none"
+                        class="absolute top-1 left-1 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex md:hidden md:group-hover:flex items-center justify-center hover:bg-red-700">×</button>
+                    {{end}}
                 </div>
                 {{end}}
                 {{end}}
