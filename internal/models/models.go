@@ -120,3 +120,11 @@ type EventPhoto struct {
 	OriginalName string    `json:"original_name"`
 	CreatedAt    time.Time `json:"created_at"`
 }
+
+type Feedback struct {
+	ID        int64     `json:"id"`
+	DriverID  int64     `json:"driver_id"`
+	EventID   *int64    `json:"event_id,omitempty"`
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
+}

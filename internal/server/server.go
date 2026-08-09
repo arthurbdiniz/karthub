@@ -59,6 +59,7 @@ func (s *Server) setupRouter() {
 	bookingRepo := repository.NewBookingRepository(s.db)
 	photoRepo := repository.NewPhotoRepository(s.db)
 	resultRepo := repository.NewResultRepository(s.db)
+	feedbackRepo := repository.NewFeedbackRepository(s.db)
 
 	// Session manager
 	sessionMgr := session.NewManager(s.db, s.cfg.Session)
@@ -78,6 +79,7 @@ func (s *Server) setupRouter() {
 	bookingHandler := handler.NewBooking(bookingRepo, eventRepo, tmpl)
 	photoHandler := handler.NewPhoto(photoRepo, driverRepo, "data/uploads")
 	resultHandler := handler.NewResult(resultRepo)
+	feedbackHandler := handler.NewFeedback(feedbackRepo, driverRepo, tmpl)
 
 	// Static files
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(templates.StaticFS()))))
@@ -139,6 +141,10 @@ func (s *Server) setupRouter() {
 			r.Delete("/{id}/admin", bookingHandler.Remove)
 		})
 
+		// Feedback
+		r.Get("/feedback", feedbackHandler.Form)
+		r.Post("/feedback", feedbackHandler.Submit)
+
 		// Admin routes
 		r.Route("/admin", func(r chi.Router) {
 			r.Use(authMw.AdminOrOrganizer)
@@ -172,6 +178,9 @@ func (s *Server) setupRouter() {
 				r.Get("/", dashHandler.Users)
 				r.Post("/{id}/role", dashHandler.SetRole)
 			})
+
+			// Feedback (visible to admin + organizer)
+			r.Get("/feedback", feedbackHandler.List)
 		})
 	})
 
