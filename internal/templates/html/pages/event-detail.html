@@ -298,7 +298,7 @@
             <div @click="if(!uploading) $refs.fileInput.click()"
                 class="p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 cursor-pointer text-center"
                 :class="{ 'pointer-events-none opacity-50': uploading }">
-                <input type="file" name="photos" accept="image/*" multiple class="hidden" x-ref="fileInput"
+                <input type="file" name="photos" accept="image/*,video/*" multiple class="hidden" x-ref="fileInput"
                     @change="
                         if($event.target.files.length === 0) return;
                         uploading = true;
@@ -314,7 +314,7 @@
                     ">
                 <template x-if="!uploading">
                     <div>
-                        <p class="text-sm text-gray-600">Tap to select photos</p>
+                        <p class="text-sm text-gray-600">Tap to select photos or videos</p>
                         <p class="text-xs text-gray-400 mt-1">You can select multiple at once</p>
                     </div>
                 </template>
@@ -331,37 +331,44 @@
         {{end}}
 
         {{if .Photos}}
-        <div x-data="{ open: false, idx: 0, photos: [{{range $i, $p := .Photos}}'/uploads/{{$p.Filename}}'{{if not (eq $i (sub (len $.Photos) 1))}},{{end}}{{end}}] }"
+        <div x-data="{ open: false, idx: 0, isVideo: false, photos: [{{range $i, $p := .Photos}}'/uploads/{{$p.Filename}}'{{if not (eq $i (sub (len $.Photos) 1))}},{{end}}{{end}}] }"
             @keydown.left.window="if(open && idx > 0) idx--"
             @keydown.right.window="if(open && idx < photos.length-1) idx++">
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {{range $i, $p := .Photos}}
-                <div class="cursor-pointer" @click="idx = {{$i}}; open = true">
+                {{if or (hasSuffix .Filename ".mp4") (hasSuffix .Filename ".mov") (hasSuffix .Filename ".webm")}}
+                <div class="cursor-pointer relative" @click="idx = {{$i}}; isVideo = true; open = true">
+                    <video src="/uploads/{{$p.Filename}}" class="w-full h-32 object-cover rounded" muted></video>
+                    <span class="absolute top-1 right-1 bg-black/60 text-white text-xs px-1 rounded">▶</span>
+                </div>
+                {{else}}
+                <div class="cursor-pointer" @click="idx = {{$i}}; isVideo = false; open = true">
                     <img src="/uploads/{{$p.Filename}}" alt="{{$p.OriginalName}}" class="w-full h-32 object-cover rounded hover:opacity-90 transition-opacity">
                 </div>
+                {{end}}
                 {{end}}
             </div>
 
             <!-- Lightbox -->
             <div x-show="open" x-cloak @click="open = false" @keydown.escape.window="open = false"
                 class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-                <!-- Previous -->
                 <button @click.stop="if(idx > 0) idx--" x-show="idx > 0"
                     class="absolute left-4 text-white text-4xl hover:text-gray-300 select-none">&#8249;</button>
-                <!-- Image -->
-                <img :src="photos[idx]" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl" @click.stop>
-                <!-- Next -->
+                <template x-if="photos[idx].endsWith('.mp4') || photos[idx].endsWith('.mov') || photos[idx].endsWith('.webm')">
+                    <video :src="photos[idx]" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl" controls autoplay @click.stop></video>
+                </template>
+                <template x-if="!photos[idx].endsWith('.mp4') && !photos[idx].endsWith('.mov') && !photos[idx].endsWith('.webm')">
+                    <img :src="photos[idx]" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl" @click.stop>
+                </template>
                 <button @click.stop="if(idx < photos.length-1) idx++" x-show="idx < photos.length-1"
                     class="absolute right-4 text-white text-4xl hover:text-gray-300 select-none">&#8250;</button>
-                <!-- Close -->
                 <button @click="open = false" class="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300">&times;</button>
-                <!-- Counter -->
                 <div class="absolute bottom-4 text-white text-sm" x-text="(idx+1) + ' / ' + photos.length"></div>
             </div>
         </div>
         {{else}}
-        <p class="text-gray-500 text-sm">No photos yet. Participants can upload race day pictures here.</p>
+        <p class="text-gray-500 text-sm">No photos yet. Participants can upload race day pictures and videos here.</p>
         {{end}}
     </div>
 </div>

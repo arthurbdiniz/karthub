@@ -46,6 +46,7 @@ func New() *Templates {
 			}
 			return *s
 		},
+		"hasSuffix": strings.HasSuffix,
 		"fmtDate": func(s string) string {
 			t, err := time.Parse(time.RFC3339, s)
 			if err != nil {

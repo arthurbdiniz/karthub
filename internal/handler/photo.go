@@ -45,7 +45,7 @@ func (h *Photo) Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseMultipartForm(50 << 20); err != nil {
+	if err := r.ParseMultipartForm(200 << 20); err != nil {
 		http.Error(w, "Upload too large", http.StatusBadRequest)
 		return
 	}
