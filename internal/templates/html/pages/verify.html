@@ -1,0 +1,20 @@
+{{define "title"}}Sign In - KartHub{{end}}
+
+{{define "content"}}
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow p-8 w-full max-w-md text-center">
+        <div class="flex justify-center mb-4">
+            <img src="/static/icon-192.png" alt="KartHub" class="w-16 h-16 rounded-lg">
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Confirm Sign In</h1>
+        <p class="text-gray-500 mb-6">Tap the button below to complete your login.</p>
+
+        <form method="POST" action="/auth/verify?token={{.Token}}">
+            <button type="submit"
+                class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-lg font-medium">
+                Sign In
+            </button>
+        </form>
+    </div>
+</div>
+{{end}}

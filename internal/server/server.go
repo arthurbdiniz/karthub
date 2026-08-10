@@ -11,6 +11,7 @@ import (
 	"github.com/karthub/karthub/internal/handler"
 	"github.com/karthub/karthub/internal/mail"
 	"github.com/karthub/karthub/internal/middleware"
+	"github.com/karthub/karthub/internal/push"
 	"github.com/karthub/karthub/internal/repository"
 	"github.com/karthub/karthub/internal/session"
 	"github.com/karthub/karthub/internal/templates"
@@ -60,6 +61,7 @@ func (s *Server) setupRouter() {
 	photoRepo := repository.NewPhotoRepository(s.db)
 	resultRepo := repository.NewResultRepository(s.db)
 	feedbackRepo := repository.NewFeedbackRepository(s.db)
+	pushRepo := repository.NewPushRepository(s.db)
 
 	// Session manager
 	sessionMgr := session.NewManager(s.db, s.cfg.Session)
@@ -81,6 +83,10 @@ func (s *Server) setupRouter() {
 	resultHandler := handler.NewResult(resultRepo)
 	feedbackHandler := handler.NewFeedback(feedbackRepo, driverRepo, tmpl)
 
+	// Push notifications
+	pushService := push.NewService(pushRepo, s.cfg.Push.VAPIDPublicKey, s.cfg.Push.VAPIDPrivateKey, s.cfg.Push.Subscriber)
+	pushHandler := handler.NewPush(pushRepo, pushService, tmpl)
+
 	// Static files
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(templates.StaticFS()))))
 
@@ -89,6 +95,7 @@ func (s *Server) setupRouter() {
 		r.Get("/login", authHandler.LoginPage)
 		r.Post("/login", authHandler.SendMagicLink)
 		r.Get("/auth/verify", authHandler.Verify)
+		r.Post("/auth/verify", authHandler.Verify)
 	})
 
 	// Authenticated routes
@@ -150,6 +157,10 @@ func (s *Server) setupRouter() {
 		r.Get("/feedback", feedbackHandler.Form)
 		r.Post("/feedback", feedbackHandler.Submit)
 
+		// Push notifications
+		r.Get("/push/vapid-key", pushHandler.VAPIDKey)
+		r.Post("/push/subscribe", pushHandler.Subscribe)
+
 		// Admin routes
 		r.Route("/admin", func(r chi.Router) {
 			r.Use(authMw.AdminOrOrganizer)
@@ -186,6 +197,10 @@ func (s *Server) setupRouter() {
 
 			// Feedback (visible to admin + organizer)
 			r.Get("/feedback", feedbackHandler.List)
+
+			// Send push notification
+			r.Get("/notify", pushHandler.Page)
+			r.Post("/notify", pushHandler.Send)
 		})
 	})
 

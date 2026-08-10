@@ -81,6 +81,15 @@ func (h *Auth) Verify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// GET: show confirmation page (don't consume yet)
+	if r.Method == http.MethodGet {
+		if err := h.tmpl.Render(w, "verify", map[string]any{"Token": tokenStr}); err != nil {
+			slog.Error("rendering verify page", "error", err)
+		}
+		return
+	}
+
+	// POST: consume the token and log in
 	email, err := h.tokens.Consume(r.Context(), tokenStr)
 	if err != nil {
 		if err := h.tmpl.Render(w, "login", map[string]any{"Error": "Invalid or expired link"}); err != nil {
