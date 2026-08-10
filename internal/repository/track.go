@@ -18,7 +18,7 @@ func NewTrackRepository(db *sql.DB) *TrackRepository {
 
 func (r *TrackRepository) List(ctx context.Context) ([]models.Track, error) {
 	rows, err := r.db.QueryContext(ctx,
-		"SELECT id, name, country, city, length_meters, indoor, location_url, map_embed, created_at, updated_at FROM tracks ORDER BY name")
+		"SELECT id, name, country, city, length_meters, indoor, location_url, map_embed, website, created_at, updated_at FROM tracks ORDER BY name")
 	if err != nil {
 		return nil, fmt.Errorf("querying tracks: %w", err)
 	}
@@ -27,7 +27,7 @@ func (r *TrackRepository) List(ctx context.Context) ([]models.Track, error) {
 	var tracks []models.Track
 	for rows.Next() {
 		var t models.Track
-		if err := rows.Scan(&t.ID, &t.Name, &t.Country, &t.City, &t.LengthMeters, &t.Indoor, &t.LocationURL, &t.MapEmbed, &t.CreatedAt, &t.UpdatedAt); err != nil {
+		if err := rows.Scan(&t.ID, &t.Name, &t.Country, &t.City, &t.LengthMeters, &t.Indoor, &t.LocationURL, &t.MapEmbed, &t.Website, &t.CreatedAt, &t.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scanning track: %w", err)
 		}
 		tracks = append(tracks, t)
@@ -38,8 +38,8 @@ func (r *TrackRepository) List(ctx context.Context) ([]models.Track, error) {
 func (r *TrackRepository) GetByID(ctx context.Context, id int64) (*models.Track, error) {
 	var t models.Track
 	err := r.db.QueryRowContext(ctx,
-		"SELECT id, name, country, city, length_meters, indoor, location_url, map_embed, created_at, updated_at FROM tracks WHERE id = ?", id,
-	).Scan(&t.ID, &t.Name, &t.Country, &t.City, &t.LengthMeters, &t.Indoor, &t.LocationURL, &t.MapEmbed, &t.CreatedAt, &t.UpdatedAt)
+		"SELECT id, name, country, city, length_meters, indoor, location_url, map_embed, website, created_at, updated_at FROM tracks WHERE id = ?", id,
+	).Scan(&t.ID, &t.Name, &t.Country, &t.City, &t.LengthMeters, &t.Indoor, &t.LocationURL, &t.MapEmbed, &t.Website, &t.CreatedAt, &t.UpdatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -51,8 +51,8 @@ func (r *TrackRepository) GetByID(ctx context.Context, id int64) (*models.Track,
 
 func (r *TrackRepository) Create(ctx context.Context, t *models.Track) error {
 	result, err := r.db.ExecContext(ctx,
-		"INSERT INTO tracks (name, country, city, length_meters, indoor, location_url, map_embed) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		t.Name, t.Country, t.City, t.LengthMeters, t.Indoor, t.LocationURL, t.MapEmbed,
+		"INSERT INTO tracks (name, country, city, length_meters, indoor, location_url, map_embed, website) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		t.Name, t.Country, t.City, t.LengthMeters, t.Indoor, t.LocationURL, t.MapEmbed, t.Website,
 	)
 	if err != nil {
 		return fmt.Errorf("inserting track: %w", err)
@@ -67,8 +67,8 @@ func (r *TrackRepository) Create(ctx context.Context, t *models.Track) error {
 
 func (r *TrackRepository) Update(ctx context.Context, t *models.Track) error {
 	_, err := r.db.ExecContext(ctx,
-		"UPDATE tracks SET name = ?, country = ?, city = ?, length_meters = ?, indoor = ?, location_url = ?, map_embed = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-		t.Name, t.Country, t.City, t.LengthMeters, t.Indoor, t.LocationURL, t.MapEmbed, t.ID,
+		"UPDATE tracks SET name = ?, country = ?, city = ?, length_meters = ?, indoor = ?, location_url = ?, map_embed = ?, website = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+		t.Name, t.Country, t.City, t.LengthMeters, t.Indoor, t.LocationURL, t.MapEmbed, t.Website, t.ID,
 	)
 	if err != nil {
 		return fmt.Errorf("updating track: %w", err)

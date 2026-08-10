@@ -54,6 +54,9 @@ func (h *Track) CreateTrack(w http.ResponseWriter, r *http.Request) {
 	if v := r.FormValue("map_embed"); v != "" {
 		t.MapEmbed = &v
 	}
+	if v := r.FormValue("website"); v != "" {
+		t.Website = &v
+	}
 	if err := h.tracks.Create(r.Context(), t); err != nil {
 		http.Error(w, "Failed to create track", http.StatusInternalServerError)
 		return
@@ -93,6 +96,11 @@ func (h *Track) Update(w http.ResponseWriter, r *http.Request) {
 		track.MapEmbed = &v
 	} else {
 		track.MapEmbed = nil
+	}
+	if v := r.FormValue("website"); v != "" {
+		track.Website = &v
+	} else {
+		track.Website = nil
 	}
 	if err := h.tracks.Update(r.Context(), track); err != nil {
 		http.Error(w, "Failed to update track", http.StatusInternalServerError)

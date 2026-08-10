@@ -42,6 +42,7 @@ type Track struct {
 	Indoor       bool      `json:"indoor"`
 	LocationURL  *string   `json:"location_url,omitempty"`
 	MapEmbed     *string   `json:"map_embed,omitempty"`
+	Website      *string   `json:"website,omitempty"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }

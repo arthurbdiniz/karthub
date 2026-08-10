@@ -23,6 +23,9 @@
                     {{if .LocationURL}}
                     <a href="{{.LocationURL}}" target="_blank" rel="noopener" class="inline-block mt-2 ml-2 text-xs text-blue-600 hover:text-blue-800">📍 Map</a>
                     {{end}}
+                    {{if .Website}}
+                    <a href="{{.Website}}" target="_blank" rel="noopener" class="inline-block mt-2 ml-2 text-xs text-blue-600 hover:text-blue-800">🌐 Website</a>
+                    {{end}}
                 </div>
                 {{if isStaff $.User.Role}}
                 <a href="/admin/tracks/{{.ID}}/edit" class="text-blue-600 hover:text-blue-800 text-sm">Edit</a>

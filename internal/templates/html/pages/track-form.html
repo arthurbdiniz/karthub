@@ -50,6 +50,14 @@
         </div>
 
         <div>
+            <label for="website" class="block text-sm font-medium text-gray-700">Website</label>
+            <input type="url" id="website" name="website"
+                placeholder="https://www.example.com"
+                value="{{if .Track}}{{if .Track.Website}}{{.Track.Website}}{{end}}{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div>
             <label for="map_embed" class="block text-sm font-medium text-gray-700">Map Embed (iframe)</label>
             <textarea id="map_embed" name="map_embed" rows="3"
                 placeholder='Paste the iframe from Google Maps "Embed a map"'
