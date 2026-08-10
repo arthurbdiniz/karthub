@@ -15,9 +15,46 @@
 
         <div>
             <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
-            <input type="text" id="country" name="country" required
-                value="{{if .Track}}{{.Track.Country}}{{end}}"
+            <select id="country" name="country" required
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+                <option value="">Select country</option>
+                <option value="Argentina" {{if .Track}}{{if eq .Track.Country "Argentina"}}selected{{end}}{{end}}>🇦🇷 Argentina</option>
+                <option value="Australia" {{if .Track}}{{if eq .Track.Country "Australia"}}selected{{end}}{{end}}>🇦🇺 Australia</option>
+                <option value="Austria" {{if .Track}}{{if eq .Track.Country "Austria"}}selected{{end}}{{end}}>🇦🇹 Austria</option>
+                <option value="Belgium" {{if .Track}}{{if eq .Track.Country "Belgium"}}selected{{end}}{{end}}>🇧🇪 Belgium</option>
+                <option value="Brazil" {{if .Track}}{{if eq .Track.Country "Brazil"}}selected{{end}}{{end}}>🇧🇷 Brazil</option>
+                <option value="Canada" {{if .Track}}{{if eq .Track.Country "Canada"}}selected{{end}}{{end}}>🇨🇦 Canada</option>
+                <option value="Chile" {{if .Track}}{{if eq .Track.Country "Chile"}}selected{{end}}{{end}}>🇨🇱 Chile</option>
+                <option value="China" {{if .Track}}{{if eq .Track.Country "China"}}selected{{end}}{{end}}>🇨🇳 China</option>
+                <option value="Colombia" {{if .Track}}{{if eq .Track.Country "Colombia"}}selected{{end}}{{end}}>🇨🇴 Colombia</option>
+                <option value="Czech Republic" {{if .Track}}{{if eq .Track.Country "Czech Republic"}}selected{{end}}{{end}}>🇨🇿 Czech Republic</option>
+                <option value="Denmark" {{if .Track}}{{if eq .Track.Country "Denmark"}}selected{{end}}{{end}}>🇩🇰 Denmark</option>
+                <option value="Finland" {{if .Track}}{{if eq .Track.Country "Finland"}}selected{{end}}{{end}}>🇫🇮 Finland</option>
+                <option value="France" {{if .Track}}{{if eq .Track.Country "France"}}selected{{end}}{{end}}>🇫🇷 France</option>
+                <option value="Germany" {{if .Track}}{{if eq .Track.Country "Germany"}}selected{{end}}{{end}}>🇩🇪 Germany</option>
+                <option value="Hungary" {{if .Track}}{{if eq .Track.Country "Hungary"}}selected{{end}}{{end}}>🇭🇺 Hungary</option>
+                <option value="India" {{if .Track}}{{if eq .Track.Country "India"}}selected{{end}}{{end}}>🇮🇳 India</option>
+                <option value="Ireland" {{if .Track}}{{if eq .Track.Country "Ireland"}}selected{{end}}{{end}}>🇮🇪 Ireland</option>
+                <option value="Italy" {{if .Track}}{{if eq .Track.Country "Italy"}}selected{{end}}{{end}}>🇮🇹 Italy</option>
+                <option value="Japan" {{if .Track}}{{if eq .Track.Country "Japan"}}selected{{end}}{{end}}>🇯🇵 Japan</option>
+                <option value="South Korea" {{if .Track}}{{if eq .Track.Country "South Korea"}}selected{{end}}{{end}}>🇰🇷 South Korea</option>
+                <option value="Latvia" {{if .Track}}{{if eq .Track.Country "Latvia"}}selected{{end}}{{end}}>🇱🇻 Latvia</option>
+                <option value="Lithuania" {{if .Track}}{{if eq .Track.Country "Lithuania"}}selected{{end}}{{end}}>🇱🇹 Lithuania</option>
+                <option value="Mexico" {{if .Track}}{{if eq .Track.Country "Mexico"}}selected{{end}}{{end}}>🇲🇽 Mexico</option>
+                <option value="Netherlands" {{if .Track}}{{if eq .Track.Country "Netherlands"}}selected{{end}}{{end}}>🇳🇱 Netherlands</option>
+                <option value="New Zealand" {{if .Track}}{{if eq .Track.Country "New Zealand"}}selected{{end}}{{end}}>🇳🇿 New Zealand</option>
+                <option value="Nigeria" {{if .Track}}{{if eq .Track.Country "Nigeria"}}selected{{end}}{{end}}>🇳🇬 Nigeria</option>
+                <option value="Norway" {{if .Track}}{{if eq .Track.Country "Norway"}}selected{{end}}{{end}}>🇳🇴 Norway</option>
+                <option value="Poland" {{if .Track}}{{if eq .Track.Country "Poland"}}selected{{end}}{{end}}>🇵🇱 Poland</option>
+                <option value="Portugal" {{if .Track}}{{if eq .Track.Country "Portugal"}}selected{{end}}{{end}}>🇵🇹 Portugal</option>
+                <option value="Romania" {{if .Track}}{{if eq .Track.Country "Romania"}}selected{{end}}{{end}}>🇷🇴 Romania</option>
+                <option value="South Africa" {{if .Track}}{{if eq .Track.Country "South Africa"}}selected{{end}}{{end}}>🇿🇦 South Africa</option>
+                <option value="Spain" {{if .Track}}{{if eq .Track.Country "Spain"}}selected{{end}}{{end}}>🇪🇸 Spain</option>
+                <option value="Sweden" {{if .Track}}{{if eq .Track.Country "Sweden"}}selected{{end}}{{end}}>🇸🇪 Sweden</option>
+                <option value="Switzerland" {{if .Track}}{{if eq .Track.Country "Switzerland"}}selected{{end}}{{end}}>🇨🇭 Switzerland</option>
+                <option value="United Kingdom" {{if .Track}}{{if eq .Track.Country "United Kingdom"}}selected{{end}}{{end}}>🇬🇧 United Kingdom</option>
+                <option value="United States" {{if .Track}}{{if eq .Track.Country "United States"}}selected{{end}}{{end}}>🇺🇸 United States</option>
+            </select>
         </div>
 
         <div>
