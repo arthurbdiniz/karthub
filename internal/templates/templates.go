@@ -27,6 +27,13 @@ func New() *Templates {
 	funcMap := template.FuncMap{
 		"add":      func(a, b int) int { return a + b },
 		"sub":      func(a, b int) int { return a - b },
+		"multiply": func(a, b int) int { return a * b },
+		"divide": func(a, b int) int {
+			if b == 0 {
+				return 0
+			}
+			return a / b
+		},
 		"safeHTML": func(s string) template.HTML { return template.HTML(s) },
 		"safeURL":  func(s string) template.URL { return template.URL(s) },
 		"isStaff": func(role string) bool {
@@ -47,8 +54,19 @@ func New() *Templates {
 			return *s
 		},
 		"hasSuffix": strings.HasSuffix,
+		"hasVoted": func(votes []int64, optionID int64) bool {
+			for _, v := range votes {
+				if v == optionID {
+					return true
+				}
+			}
+			return false
+		},
 		"fmtDate": func(s string) string {
 			t, err := time.Parse(time.RFC3339, s)
+			if err != nil {
+				t, err = time.Parse("2006-01-02 15:04:05", s)
+			}
 			if err != nil {
 				t, err = time.Parse("2006-01-02", s)
 			}

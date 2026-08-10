@@ -25,6 +25,7 @@
             {{if .User}}
             <div class="hidden md:flex items-center space-x-6">
                 <a href="/events" class="text-gray-600 hover:text-gray-900 text-sm">Events</a>
+                <a href="/polls" class="text-gray-600 hover:text-gray-900 text-sm">Polls</a>
                 <a href="/drivers" class="text-gray-600 hover:text-gray-900 text-sm">Drivers</a>
                 <a href="/tracks" class="text-gray-600 hover:text-gray-900 text-sm">Tracks</a>
                 {{if eq .User.Role "admin"}}
@@ -53,6 +54,7 @@
         class="md:hidden fixed top-0 left-0 h-full shadow-lg transform pt-14" style="width: 75%; background: white; z-index: 9999">
         <div class="px-4 py-4 space-y-3">
             <a href="/events" class="block text-gray-700 hover:text-gray-900 py-3 text-lg" @click="open = false">Events</a>
+            <a href="/polls" class="block text-gray-700 hover:text-gray-900 py-3 text-lg" @click="open = false">Polls</a>
             <a href="/drivers" class="block text-gray-700 hover:text-gray-900 py-3 text-lg" @click="open = false">Drivers</a>
             <a href="/tracks" class="block text-gray-700 hover:text-gray-900 py-3 text-lg" @click="open = false">Tracks</a>
             {{if eq .User.Role "admin"}}

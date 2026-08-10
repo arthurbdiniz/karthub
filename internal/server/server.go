@@ -62,6 +62,7 @@ func (s *Server) setupRouter() {
 	resultRepo := repository.NewResultRepository(s.db)
 	feedbackRepo := repository.NewFeedbackRepository(s.db)
 	pushRepo := repository.NewPushRepository(s.db)
+	pollRepo := repository.NewPollRepository(s.db)
 
 	// Session manager
 	sessionMgr := session.NewManager(s.db, s.cfg.Session)
@@ -86,6 +87,7 @@ func (s *Server) setupRouter() {
 	// Push notifications
 	pushService := push.NewService(pushRepo, s.cfg.Push.VAPIDPublicKey, s.cfg.Push.VAPIDPrivateKey, s.cfg.Push.Subscriber)
 	pushHandler := handler.NewPush(pushRepo, pushService, tmpl)
+	pollHandler := handler.NewPoll(pollRepo, driverRepo, tmpl)
 
 	// Static files
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.FS(templates.StaticFS()))))
@@ -160,6 +162,19 @@ func (s *Server) setupRouter() {
 		// Push notifications
 		r.Get("/push/vapid-key", pushHandler.VAPIDKey)
 		r.Post("/push/subscribe", pushHandler.Subscribe)
+
+		// Polls
+		r.Route("/polls", func(r chi.Router) {
+			r.Get("/", pollHandler.List)
+			r.Get("/new", pollHandler.NewForm)
+			r.Post("/", pollHandler.Create)
+			r.Get("/{id}", pollHandler.Show)
+			r.Get("/{id}/edit", pollHandler.EditForm)
+			r.Post("/{id}", pollHandler.Update)
+			r.Post("/{id}/vote", pollHandler.Vote)
+			r.Post("/{id}/toggle", pollHandler.ToggleStatus)
+			r.Post("/{id}/delete", pollHandler.DeletePoll)
+		})
 
 		// Admin routes
 		r.Route("/admin", func(r chi.Router) {

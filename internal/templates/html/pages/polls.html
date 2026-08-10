@@ -1,0 +1,39 @@
+{{define "title"}}Polls - KartHub{{end}}
+
+{{define "content"}}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Polls</h1>
+        {{if isStaff .User.Role}}
+        <a href="/polls/new" class="bg-blue-600 text-white text-sm py-2 px-4 rounded hover:bg-blue-700">+ New Poll</a>
+        {{end}}
+    </div>
+
+    {{if .Polls}}
+    <div class="space-y-4">
+        {{range .Polls}}
+        <a href="/polls/{{.ID}}" class="block bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-2">
+                <p class="font-semibold text-gray-900">{{.Title}}</p>
+                {{if eq .Status "open"}}
+                <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex-shrink-0 ml-2">Open</span>
+                {{else}}
+                <span class="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full flex-shrink-0 ml-2">Closed</span>
+                {{end}}
+            </div>
+            <div class="text-xs text-gray-500">
+                <span>{{.VoteCount}} vote{{if ne .VoteCount 1}}s{{end}}</span> ·
+                <span>{{.CreatedAt | fmtDate}}</span>
+                {{if .ClosesAt}} · <span>Closes {{deref .ClosesAt | fmtDate}}</span>{{end}}
+                {{if .AllowMultiple}} · <span class="text-blue-600">Multi-select</span>{{end}}
+            </div>
+        </a>
+        {{end}}
+    </div>
+    {{else}}
+    <div class="bg-white rounded-lg shadow p-6 text-center">
+        <p class="text-gray-500">No polls yet.</p>
+    </div>
+    {{end}}
+</div>
+{{end}}

@@ -1,0 +1,54 @@
+{{define "title"}}New Poll - KartHub{{end}}
+
+{{define "content"}}
+<div class="max-w-lg mx-auto space-y-6">
+    <div>
+        <a href="/polls" class="text-gray-500 hover:text-gray-700 text-sm">← Back to Polls</a>
+        <h1 class="text-2xl font-bold text-gray-900 mt-2">New Poll</h1>
+    </div>
+
+    <form method="POST" action="/polls" class="bg-white rounded-lg shadow p-6 space-y-4" x-data="{ options: [{label:''}, {label:''}] }">
+        <div>
+            <label for="title" class="block text-sm font-medium text-gray-700">Question</label>
+            <input type="text" id="title" name="title" required placeholder="e.g. Where should we race next?"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Options</label>
+            <template x-for="(opt, i) in options" :key="i">
+                <div class="flex space-x-2 mb-2">
+                    <input type="text" :name="'option_' + i" x-model="opt.label" required placeholder="Option"
+                        class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-sm">
+                    <button type="button" @click="if(options.length > 2) options.splice(i, 1)" class="text-red-500 text-sm px-2" x-show="options.length > 2">×</button>
+                </div>
+            </template>
+            <button type="button" @click="options.push({label:''})" class="text-sm text-blue-600 hover:text-blue-800">+ Add option</button>
+        </div>
+
+        <div class="border-t border-gray-100 pt-4 space-y-3">
+            <p class="text-sm font-medium text-gray-700">Settings</p>
+
+            <label class="flex items-center space-x-2">
+                <input type="checkbox" name="allow_multiple" class="rounded border-gray-300 text-blue-600">
+                <span class="text-sm text-gray-700">Allow multiple answers</span>
+            </label>
+
+            <div>
+                <label class="block text-sm text-gray-700 mb-1">End time (optional)</label>
+                <div class="flex space-x-2">
+                    <input type="date" name="closes_date"
+                        class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-sm">
+                    <input type="time" name="closes_time"
+                        class="w-28 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-sm">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit"
+            class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+            Create Poll
+        </button>
+    </form>
+</div>
+{{end}}
