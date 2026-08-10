@@ -13,6 +13,7 @@ type Config struct {
 	Database DatabaseConfig `yaml:"database"`
 	Session  SessionConfig  `yaml:"session"`
 	Mail     MailConfig     `yaml:"mail"`
+	Push     PushConfig     `yaml:"push"`
 	Log      LogConfig      `yaml:"log"`
 	BaseURL  string         `yaml:"base_url"`
 }
@@ -38,6 +39,12 @@ type MailConfig struct {
 	FromAddress  string `yaml:"from_address"`
 	FromName     string `yaml:"from_name"`
 	DevMode      bool   `yaml:"dev_mode"`
+}
+
+type PushConfig struct {
+	VAPIDPublicKey  string `yaml:"vapid_public_key"`
+	VAPIDPrivateKey string `yaml:"vapid_private_key"`
+	Subscriber      string `yaml:"subscriber"`
 }
 
 type LogConfig struct {
@@ -113,5 +120,14 @@ func applyEnvOverrides(cfg *Config) {
 	}
 	if v := os.Getenv("KARTHUB_BASE_URL"); v != "" {
 		cfg.BaseURL = v
+	}
+	if v := os.Getenv("KARTHUB_VAPID_PUBLIC_KEY"); v != "" {
+		cfg.Push.VAPIDPublicKey = v
+	}
+	if v := os.Getenv("KARTHUB_VAPID_PRIVATE_KEY"); v != "" {
+		cfg.Push.VAPIDPrivateKey = v
+	}
+	if v := os.Getenv("KARTHUB_VAPID_SUBSCRIBER"); v != "" {
+		cfg.Push.Subscriber = v
 	}
 }
