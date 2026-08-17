@@ -3,7 +3,7 @@
 {{define "content"}}
 <div class="space-y-6">
     <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900">Drivers</h1>
+        <h1 class="text-2xl font-bold text-gray-900">Drivers ({{len .Drivers}})</h1>
         {{if not .MyDriver}}
         <a href="/drivers/new" class="bg-blue-600 text-white text-sm py-2 px-4 rounded hover:bg-blue-700">+ Create My Profile</a>
         {{else}}
