@@ -90,6 +90,19 @@ func (h *Driver) Setup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check nickname uniqueness
+	taken, err := h.drivers.NicknameExists(r.Context(), nickname, 0)
+	if err != nil {
+		http.Error(w, "Internal error", http.StatusInternalServerError)
+		return
+	}
+	if taken {
+		if err := h.tmpl.Render(w, "setup", map[string]any{"User": user, "Error": "That nickname is already taken. Please choose another."}); err != nil {
+			http.Error(w, "Internal error", http.StatusInternalServerError)
+		}
+		return
+	}
+
 	d := &models.Driver{
 		UserID:   &user.ID,
 		Name:     r.FormValue("name"),
@@ -179,6 +192,22 @@ func (h *Driver) UpdateMyProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	driver.Name = r.FormValue("name")
 	if v := r.FormValue("nickname"); v != "" {
+		// Check nickname uniqueness
+		taken, err := h.drivers.NicknameExists(r.Context(), v, driver.ID)
+		if err != nil {
+			http.Error(w, "Internal error", http.StatusInternalServerError)
+			return
+		}
+		if taken {
+			if err := h.tmpl.Render(w, "driver-form", map[string]any{
+				"User":   user,
+				"Driver": driver,
+				"Error":  "That nickname is already taken. Please choose another.",
+			}); err != nil {
+				http.Error(w, "Internal error", http.StatusInternalServerError)
+			}
+			return
+		}
 		driver.Nickname = &v
 	}
 	if v := r.FormValue("bio"); v != "" {

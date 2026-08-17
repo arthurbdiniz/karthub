@@ -6,6 +6,10 @@
 
     <form method="POST" action="{{if .Driver}}/drivers/me{{else}}/drivers/new{{end}}" enctype="multipart/form-data" class="space-y-4 bg-white rounded-lg shadow p-6">
 
+        {{if .Error}}
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">{{.Error}}</div>
+        {{end}}
+
         <div>
             <label for="nickname" class="block text-sm font-medium text-gray-700">Nickname</label>
             <input type="text" id="nickname" name="nickname" required

@@ -97,3 +97,15 @@ func (r *DriverRepository) GetByUserID(ctx context.Context, userID int64) (*mode
 	}
 	return &d, nil
 }
+
+// NicknameExists checks if a nickname is already taken by another driver.
+func (r *DriverRepository) NicknameExists(ctx context.Context, nickname string, excludeDriverID int64) (bool, error) {
+	var count int
+	err := r.db.QueryRowContext(ctx,
+		"SELECT COUNT(*) FROM drivers WHERE nickname = ? AND id != ?", nickname, excludeDriverID,
+	).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("checking nickname: %w", err)
+	}
+	return count > 0, nil
+}
