@@ -178,6 +178,9 @@ func (h *Driver) UpdateMyProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	driver.Name = r.FormValue("name")
+	if v := r.FormValue("nickname"); v != "" {
+		driver.Nickname = &v
+	}
 	if v := r.FormValue("bio"); v != "" {
 		driver.Bio = &v
 	}

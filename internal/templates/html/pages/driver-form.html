@@ -6,15 +6,12 @@
 
     <form method="POST" action="{{if .Driver}}/drivers/me{{else}}/drivers/new{{end}}" enctype="multipart/form-data" class="space-y-4 bg-white rounded-lg shadow p-6">
 
-        {{if .Driver}}
         <div>
-            <label class="block text-sm font-medium text-gray-700">Nickname</label>
-            <input type="text" disabled
-                value="{{if .Driver.Nickname}}{{.Driver.Nickname}}{{end}}"
-                class="mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-500 px-3 py-2 border cursor-not-allowed">
-            <p class="mt-1 text-xs text-gray-400">Nickname cannot be changed</p>
+            <label for="nickname" class="block text-sm font-medium text-gray-700">Nickname</label>
+            <input type="text" id="nickname" name="nickname" required
+                value="{{if .Driver}}{{if .Driver.Nickname}}{{.Driver.Nickname}}{{end}}{{end}}"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
         </div>
-        {{end}}
 
         <div>
             <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>

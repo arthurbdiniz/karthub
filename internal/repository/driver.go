@@ -67,8 +67,8 @@ func (r *DriverRepository) Create(ctx context.Context, d *models.Driver) error {
 
 func (r *DriverRepository) Update(ctx context.Context, d *models.Driver) error {
 	_, err := r.db.ExecContext(ctx,
-		"UPDATE drivers SET name = ?, avatar = ?, country_code = ?, bio = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-		d.Name, d.Avatar, d.CountryCode, d.Bio, d.ID,
+		"UPDATE drivers SET name = ?, nickname = ?, avatar = ?, country_code = ?, bio = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+		d.Name, d.Nickname, d.Avatar, d.CountryCode, d.Bio, d.ID,
 	)
 	if err != nil {
 		return fmt.Errorf("updating driver: %w", err)
