@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -76,10 +77,10 @@ func (h *Push) Send(w http.ResponseWriter, r *http.Request) {
 	case "event":
 		if eventID != "" {
 			id, _ := strconv.ParseInt(eventID, 10, 64)
-			go h.service.SendToEvent(r.Context(), id, payload)
+			go h.service.SendToEvent(context.Background(), id, payload)
 		}
 	default:
-		go h.service.SendAll(r.Context(), payload)
+		go h.service.SendAll(context.Background(), payload)
 	}
 
 	if err := h.tmpl.Render(w, "notify", map[string]any{"User": user, "Success": true}); err != nil {
