@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"html/template"
@@ -10,6 +11,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/renderer/html"
 )
 
 //go:embed html/*.html html/**/*.html
@@ -54,6 +59,7 @@ func New() *Templates {
 			return *s
 		},
 		"hasSuffix": strings.HasSuffix,
+		"markdown":  renderMarkdown,
 		"hasVoted": func(votes []int64, optionID int64) bool {
 			for _, v := range votes {
 				if v == optionID {
@@ -137,4 +143,21 @@ func (t *Templates) RenderPartial(w io.Writer, name string, data any) error {
 func StaticFS() fs.FS {
 	sub, _ := fs.Sub(staticFS, "static")
 	return sub
+}
+
+var md = goldmark.New(
+	goldmark.WithExtensions(extension.Linkify),
+	goldmark.WithRendererOptions(
+		html.WithHardWraps(),
+		html.WithUnsafe(),
+	),
+)
+
+// renderMarkdown converts markdown text to safe HTML using goldmark.
+func renderMarkdown(s string) template.HTML {
+	var buf bytes.Buffer
+	if err := md.Convert([]byte(s), &buf); err != nil {
+		return template.HTML(template.HTMLEscapeString(s))
+	}
+	return template.HTML(buf.String())
 }
