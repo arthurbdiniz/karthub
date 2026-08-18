@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -218,7 +219,7 @@ func (h *Event) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to update event", http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/events", http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("/events/%d", id), http.StatusFound)
 }
 
 func (h *Event) Delete(w http.ResponseWriter, r *http.Request) {
