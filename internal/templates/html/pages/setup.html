@@ -76,10 +76,39 @@
                 </select>
             </div>
 
-            <div>
-                <label for="avatar" class="block text-sm font-medium text-gray-700">Profile Picture</label>
-                <input type="file" id="avatar" name="avatar" accept="image/*"
+            <div x-data="avatarCropper()" x-init="init()">
+                <label class="block text-sm font-medium text-gray-700">Profile Picture</label>
+
+                <template x-if="preview">
+                    <div class="mb-2">
+                        <img :src="preview" class="w-16 h-16 rounded-full object-cover">
+                        <button type="button" @click="clearPreview()" class="text-xs text-red-600 mt-1">Remove</button>
+                    </div>
+                </template>
+
+                <input type="file" accept="image/*" @change="onFileSelect($event)"
                     class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+
+                <input type="hidden" name="avatar_cropped" :value="croppedData">
+
+                <!-- Crop Modal -->
+                <div x-show="showModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.8)">
+                    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" @click.stop>
+                        <div class="p-4 border-b">
+                            <h3 class="text-lg font-semibold text-gray-900">Crop your photo</h3>
+                        </div>
+                        <div style="height: 300px; overflow: hidden;">
+                            <img x-ref="cropImg" :src="imageSrc" style="display: block; max-width: 100%; opacity: 0;">
+                        </div>
+                        <div class="p-4 border-t bg-gray-50 flex items-center justify-between">
+                            <p class="text-xs text-gray-400">Drag to reposition, pinch to zoom</p>
+                            <div class="flex gap-3">
+                                <button type="button" @click="cancelCrop()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                                <button type="button" @click="applyCrop()" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <button type="submit"
@@ -89,4 +118,14 @@
         </form>
     </div>
 </div>
+
+<link rel="stylesheet" href="/static/cropper.min.css">
+<style>
+    .cropper-view-box,
+    .cropper-face {
+        border-radius: 50%;
+    }
+</style>
+<script src="/static/cropper.min.js"></script>
+<script src="/static/avatar-cropper.js"></script>
 {{end}}

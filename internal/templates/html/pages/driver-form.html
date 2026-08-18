@@ -76,18 +76,49 @@
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">{{if .Driver}}{{if .Driver.Bio}}{{.Driver.Bio}}{{end}}{{end}}</textarea>
         </div>
 
-        <div>
-            <label for="avatar" class="block text-sm font-medium text-gray-700">Profile Picture</label>
+        <div x-data="avatarCropper()" x-init="init()">
+            <label class="block text-sm font-medium text-gray-700">Profile Picture</label>
             {{if .Driver}}{{if .Driver.Avatar}}
-            <img src="{{.Driver.Avatar | safeURL}}" alt="Current avatar" class="w-16 h-16 rounded-full object-cover mb-2">
-            <label class="flex items-center space-x-2 mb-2">
+            <img x-show="!preview" src="{{.Driver.Avatar | safeURL}}" alt="Current avatar" class="w-16 h-16 rounded-full object-cover mb-2">
+            <label x-show="!preview" class="flex items-center space-x-2 mb-2">
                 <input type="checkbox" name="remove_avatar" value="1" class="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500">
                 <span class="text-sm text-red-600">Remove picture</span>
             </label>
             {{end}}{{end}}
-            <input type="file" id="avatar" name="avatar" accept="image/*"
+
+            <!-- Preview of cropped image -->
+            <template x-if="preview">
+                <div class="mb-2">
+                    <img :src="preview" class="w-16 h-16 rounded-full object-cover">
+                    <button type="button" @click="clearPreview()" class="text-xs text-red-600 mt-1">Remove</button>
+                </div>
+            </template>
+
+            <input type="file" accept="image/*" @change="onFileSelect($event)"
                 class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-            <p class="mt-1 text-xs text-gray-400">Leave empty to keep current picture</p>
+            <p class="mt-1 text-xs text-gray-400">Select an image to crop</p>
+
+            <!-- Hidden input that holds the cropped base64 data -->
+            <input type="hidden" name="avatar_cropped" :value="croppedData">
+
+            <!-- Crop Modal -->
+            <div x-show="showModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.8)">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" @click.stop>
+                    <div class="p-4 border-b">
+                        <h3 class="text-lg font-semibold text-gray-900">Crop your photo</h3>
+                    </div>
+                    <div style="height: 300px; overflow: hidden;">
+                        <img x-ref="cropImg" :src="imageSrc" style="display: block; max-width: 100%; opacity: 0;">
+                    </div>
+                    <div class="p-4 border-t bg-gray-50 flex items-center justify-between">
+                        <p class="text-xs text-gray-400">Drag to reposition, pinch to zoom</p>
+                        <div class="flex gap-3">
+                            <button type="button" @click="cancelCrop()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                            <button type="button" @click="applyCrop()" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="flex justify-between items-center pt-4">
@@ -99,4 +130,14 @@
         </div>
     </form>
 </div>
+
+<link rel="stylesheet" href="/static/cropper.min.css">
+<style>
+    .cropper-view-box,
+    .cropper-face {
+        border-radius: 50%;
+    }
+</style>
+<script src="/static/cropper.min.js"></script>
+<script src="/static/avatar-cropper.js"></script>
 {{end}}

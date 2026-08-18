@@ -1,7 +1,11 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/base64"
+	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"net/http"
 	"strconv"
@@ -12,6 +16,7 @@ import (
 	"github.com/karthub/karthub/internal/models"
 	"github.com/karthub/karthub/internal/repository"
 	"github.com/karthub/karthub/internal/templates"
+	xdraw "golang.org/x/image/draw"
 )
 
 type Driver struct {
@@ -286,32 +291,69 @@ func (h *Driver) Delete(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/drivers", http.StatusFound)
 }
 
-// readAvatar reads the uploaded file and returns a base64 data URI.
-// Returns empty string if no file uploaded.
+// readAvatar reads the avatar from the form. It first checks for a pre-cropped
+// base64 data URI from the client-side cropper, then falls back to the file upload.
+// Returns empty string if no avatar provided.
 func readAvatar(r *http.Request) string {
 	if err := r.ParseMultipartForm(2 << 20); err != nil {
 		return ""
 	}
-	file, header, err := r.FormFile("avatar")
+
+	// Prefer pre-cropped data from the client-side cropper
+	if cropped := r.FormValue("avatar_cropped"); cropped != "" && len(cropped) > 20 {
+		return cropped
+	}
+
+	file, _, err := r.FormFile("avatar")
 	if err != nil {
 		return ""
 	}
 	defer func() { _ = file.Close() }()
-
-	ct := header.Header.Get("Content-Type")
-	if ct == "" {
-		buf := make([]byte, 512)
-		n, _ := file.Read(buf)
-		ct = http.DetectContentType(buf[:n])
-		if _, err := file.Seek(0, io.SeekStart); err != nil {
-			return ""
-		}
-	}
 
 	data, err := io.ReadAll(file)
 	if err != nil {
 		return ""
 	}
 
-	return "data:" + ct + ";base64," + base64.StdEncoding.EncodeToString(data)
+	ct := http.DetectContentType(data)
+
+	// Decode image
+	var img image.Image
+	switch ct {
+	case "image/jpeg":
+		img, err = jpeg.Decode(bytes.NewReader(data))
+	case "image/png":
+		img, err = png.Decode(bytes.NewReader(data))
+	default:
+		// Unsupported format, store as-is but capped at raw size
+		return "data:" + ct + ";base64," + base64.StdEncoding.EncodeToString(data)
+	}
+	if err != nil {
+		return ""
+	}
+
+	// Resize to fit within 200x200 maintaining aspect ratio
+	const maxSize = 200
+	bounds := img.Bounds()
+	w, h := bounds.Dx(), bounds.Dy()
+	if w > maxSize || h > maxSize {
+		if w > h {
+			h = h * maxSize / w
+			w = maxSize
+		} else {
+			w = w * maxSize / h
+			h = maxSize
+		}
+	}
+
+	resized := image.NewRGBA(image.Rect(0, 0, w, h))
+	xdraw.BiLinear.Scale(resized, resized.Bounds(), img, bounds, xdraw.Over, nil)
+
+	// Encode as JPEG with quality 80
+	var buf bytes.Buffer
+	if err := jpeg.Encode(&buf, resized, &jpeg.Options{Quality: 80}); err != nil {
+		return ""
+	}
+
+	return "data:image/jpeg;base64," + base64.StdEncoding.EncodeToString(buf.Bytes())
 }
