@@ -1,6 +1,6 @@
 module github.com/karthub/karthub
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/SherClockHolmes/webpush-go v1.4.0
@@ -17,6 +17,7 @@ require (
 	github.com/yuin/goldmark v1.8.5 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/image v0.45.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 )
