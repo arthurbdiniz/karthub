@@ -201,10 +201,6 @@ func (h *Poll) Update(w http.ResponseWriter, r *http.Request) {
 	// Update options only if no votes
 	hasVotes, _ := h.polls.HasVotes(r.Context(), id)
 	if !hasVotes {
-		type opt struct {
-			TrackID *int64
-			Label   string
-		}
 		var options []struct {
 			TrackID *int64
 			Label   string
