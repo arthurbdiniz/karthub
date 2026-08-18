@@ -8,6 +8,7 @@ RUN go mod download
 
 COPY . .
 RUN CGO_ENABLED=1 go build -ldflags="-s -w" -o /karthub ./cmd/server
+RUN CGO_ENABLED=1 go build -ldflags="-s -w" -o /optimize-avatars ./cmd/optimize-avatars
 
 FROM alpine:3.20
 
@@ -15,6 +16,7 @@ RUN apk add --no-cache ca-certificates sqlite
 
 WORKDIR /app
 COPY --from=builder /karthub .
+COPY --from=builder /optimize-avatars .
 
 RUN mkdir -p /app/data /app/data/uploads
 
